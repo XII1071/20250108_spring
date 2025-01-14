@@ -1,13 +1,20 @@
 package com.example.ex3.repository;
 
 
-
 import com.example.ex3.entity.Memo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
@@ -34,11 +41,12 @@ class MemoRepositoryTests {
 //            .build();
         Memo memo = new Memo();
         memo.setMemoText("Simple memo... " + value);
-        // insert 에 해당되는 save
+        // insert에 해당되는 save
         memoRepository.save(memo);
       }
     });
   }
+
   @Test
   public void testUpdate() {
     Memo memo = new Memo();
@@ -54,20 +62,61 @@ class MemoRepositoryTests {
       memoRepository.save(m);
       System.out.println(m);
     }
+
   }
-@Test
-public void testFind() {
-// select에 해당되는 findId()
-  Optional<Memo> result = memoRepository.findById(100L);
-  if (result.isPresent()) System.out.println(result.get());
-    else System.out.println("없습니다");
+  @Test
+  public void testFind() {
+    // select에 해당되는 findById()
+    Optional<Memo> result = memoRepository.findById(100L);
+    if (result.isPresent()) System.out.println(result.get());
+    else System.out.println("없습니다.");
   }
 
   @Test
   public void testDelete() {
-// delete 해당되는 deleteId()
+    // delte 해당되는 deleteById()
     memoRepository.deleteById(100L);
   }
+
+  @Test
+  public void testFindByMnoBetweenOrderByMnoDesc() {
+    List<Memo> list = memoRepository.findByMnoBetweenOrderByMnoDesc(1l, 10l);
+    for (Memo m : list) {
+      System.out.println(m);
+    }
+  }
+
+  @Test
+  public void testFindByMemoTextContaining() {
+    List<Memo> list = memoRepository.findByMemoTextContaining("7");
+    for (Memo memo : list) {
+      System.out.println(memo);
+    }
+  }
+  @Test
+  public void testFindByMemoTextNotContaining() {
+    List<Memo> list = memoRepository.findByMemoTextNotContaining("7");
+    for (Memo memo : list) {
+      System.out.println(memo);
+    }
+  }
+
+  @Test
+  public void testFindByMnoBetween() {
+    Pageable pageable = PageRequest.of(3, 10, Sort.by("mno").descending());
+    Page<Memo> result = memoRepository.findByMnoBetween(10L, 50L, pageable);
+    result.get().forEach(new Consumer<Memo>() {
+      @Override
+      public void accept(Memo memo) {
+        System.out.println(memo);
+      }
+    });
+  }
+
+  @Test
+  public void getListDesc() {
+    List<Memo> list = memoRepository.getMemoListDesc();
+    for(Memo m : list) System.out.println(m);
+  }
+
 }
-
-
