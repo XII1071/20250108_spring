@@ -2,11 +2,24 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Index</title>
 </head>
 <body>
 <h1>index</h1>
-<a th:href="@{/member/login}">login</a><br>
-<a th:href="@{/member/join}">join</a><br>
+<!--
+    하이퍼 링크를 적용할 때 th:가 없는 경우
+    static과 templates은 context-path와 함께 적용 가능,
+    context-path가 없는 경우는 상대경로로 인식
+    templates의 경로는 controller 정의가 있는 경우 하이퍼 링크 적용.
+    static의 경로는 controller가 없어도 경로만 일치하면 적용가능.
+-->
+<a href="static.html">static</a><br> <!--상대경로-->
+<a href="/ex2/static.html">static</a><br> <!--절대경로-->
+<a href="/ex2/member/login">static login</a><br>
+
+<!-- 하이퍼 링크를 적용할 때 th:을 붙이면 context-path를 @{}로 대체 -->
+<a th:href="@{/member/login}">Login</a><br/>
+<a th:href="@{/member/join}">Join</a><br/>
+<a th:href="@{/member/static}">/member/static</a><br/>
 </body>
 </html>
