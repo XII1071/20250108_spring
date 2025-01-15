@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>read</title>
+</head>
+<body>
+<h1>read</h1>
+<form th:action="@{/memo/get}" method="get">
+  <label>글번호 <input type="text" name="mno" id="mno"></label>
+  <button type="submit">조회</button>
+
+</form>
+<script th:inline="javascript">
+  let dto = [[${memoDTo}]]
+  if(dto) console.log(dto.mno+"/"+dto.memoText)
+</script>
+</body>
+</html>

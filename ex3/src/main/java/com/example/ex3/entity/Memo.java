@@ -7,9 +7,13 @@ import lombok.*;
 @Table(name = "tbl_memo")
 @Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class Memo {
+  public Memo() {  }
+
+  public Memo(Long mno, String memoText) {
+    this.mno = mno;this.memoText = memoText;
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long mno;
