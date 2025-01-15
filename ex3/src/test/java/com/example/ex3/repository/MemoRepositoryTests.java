@@ -103,7 +103,7 @@ class MemoRepositoryTests {
 
   @Test
   public void testFindByMnoBetween() {
-    Pageable pageable = PageRequest.of(3, 10, Sort.by("mno").descending());
+    Pageable pageable = PageRequest.of(5, 10, Sort.by("mno").descending());
     Page<Memo> result = memoRepository.findByMnoBetween(10L, 50L, pageable);
     result.get().forEach(new Consumer<Memo>() {
       @Override

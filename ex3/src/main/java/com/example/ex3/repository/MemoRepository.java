@@ -29,5 +29,4 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
   List<Memo> getMemoListDesc();
 
 
-  Page<Memo> findByMnoBetween(long l, long l1, Pageable pageable);
 }

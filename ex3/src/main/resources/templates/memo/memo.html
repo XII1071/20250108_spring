@@ -6,7 +6,7 @@
 </head>
 <body>
 <h1>memo</h1>
-<form th:action="@{/memo/post}">
+<form th:action="@{/memo/post}" method="post">
     <input type="text" name="memoText" id="memoText">
     <button type="submit">전송</button>
 </form>
