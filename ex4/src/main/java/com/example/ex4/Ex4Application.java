@@ -15,5 +15,3 @@ public class Ex4Application {
 	}
 
 }
-
-
