@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic :: setContent({this:content})}">
+</th:block>
+<input type="text" name="id" th:value="${abc}"/>
+
+<!-- th: 자바에 있는 변수를 가져오기 위해 사용. (thymeleaf 문법 )-->
+<span th:text="${abc}"></span>
+<span>[[${abc}]]</span>
+</html>
