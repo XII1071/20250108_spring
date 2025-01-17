@@ -2,6 +2,7 @@ package com.example.ex4.service;
 
 import com.example.ex4.dto.GuestbookDTO;
 import com.example.ex4.dto.PageRequestDTO;
+import com.example.ex4.dto.PageResultDTO;
 import com.example.ex4.entity.Guestbook;
 
 public interface GuestbookService {
@@ -28,5 +29,5 @@ public interface GuestbookService {
   }
   Long register(GuestbookDTO guestbookDTO);
 
-  PageRequestDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO pageRequestDTO);
+  PageResultDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO pageRequestDTO);
 }
