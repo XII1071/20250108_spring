@@ -2,7 +2,71 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
     <th:block th:fragment="content">
-        <h1 class="mt-4">Guestbook List Page</h1>
+        <h1 class="mt-4">Guestbook List Page
+            <a class="btn btn-outline-primary" th:href="@{/guestbook/register}">Register</a>
+        </h1>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Gno</th>
+                <th>Title</th>
+                <th>Writer</th>
+                <th>RegDate</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="guestbookDto : ${result.dtoList}">
+                <td>[[${guestbookDto.gno}]]</td>
+                <td>[[${guestbookDto.title}]]</td>
+                <td>[[${guestbookDto.writer}]]</td>
+                <td>[[${#temporals.format(guestbookDto.regDate,
+                    'yyyy/MM/dd hh:mm')}]]</td>
+            </tr>
+            </tbody>
+        </table>
+        <ul class="pagination h-100 justify-content-center align-items-center">
+            <li class="page-item" th:if="${result.prev}">
+                <a class="page-link" tabindex="-1"
+                   th:href="@{/guestbook/list(page=${result.start-1})}"
+                >Prev</a>
+            </li>
+            <li th:class="'page-item' +${result.page == page?' active':''} "
+                th:each="page: ${result.pageList}">
+                <a class="page-link" th:href="@{/guestbook/list(page=${page})}">[[${page}]]</a>
+            </li>
+            <li class="page-item" th:if="${result.next}">
+                <a class="page-link" th:href="@{/guestbook/list(page=${result.end+1})}">Next</a>
+            </li>
+        </ul>
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <!-- <button type="button"  class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            window.onload = () => {
+                var msg = [[${msg}]]
+                if(msg) {
+                    const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                    document.querySelector(".modal-body").innerHTML=`<p>${msg}되었습니다.</p>`
+                    document.querySelector("#exampleModalLabel")
+                        .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
+                    myModal.show()
+                }
+                history.replaceState({}, null, null)
+            }
+        </script>
     </th:block>
 </th:block>
 
