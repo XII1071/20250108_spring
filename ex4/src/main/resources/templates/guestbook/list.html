@@ -15,12 +15,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="guestbookDto : ${result.dtoList}">
+            <tr th:each="guestbookDto : ${result.dtoList}" style="cursor:pointer"
+                onmouseover="this.style.background='#d6e6ff'"
+                onmouseout="this.style.background='white'"
+                th:onclick="goRead([[${guestbookDto.gno}]], [[${result.page}]])">
                 <td>[[${guestbookDto.gno}]]</td>
                 <td>[[${guestbookDto.title}]]</td>
                 <td>[[${guestbookDto.writer}]]</td>
                 <td>[[${#temporals.format(guestbookDto.regDate,
-                    'yyyy/MM/dd hh:mm')}]]</td>
+                    'yyyy/MM/dd hh:mm')}]]
+                </td>
             </tr>
             </tbody>
         </table>
@@ -65,6 +69,10 @@
                     myModal.show()
                 }
                 history.replaceState({}, null, null)
+            }
+            function goRead(gno, page){
+                let url = /*[[@{/guestbook/read}]]*/'url'
+                location.href = url + `?gno=${gno}&page=${page}`
             }
         </script>
     </th:block>

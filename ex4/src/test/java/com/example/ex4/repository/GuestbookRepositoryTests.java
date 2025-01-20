@@ -31,9 +31,9 @@ class GuestbookRepositoryTests {
       @Override
       public void accept(int i) {
         Guestbook guestbook = Guestbook.builder()
-            .title("Title..."+i)
-            .content("Content..."+i)
-            .writer("user"+(i%10))
+            .title("Title..." + i)
+            .content("Content..." + i)
+            .writer("user" + (i % 10))
             .build();
         System.out.println(guestbookRepository.save(guestbook));
       }
@@ -89,7 +89,7 @@ class GuestbookRepositoryTests {
     String keyword = "1";
     BooleanBuilder builder = new BooleanBuilder();
     BooleanExpression exTitle = qGuestbook.title.contains(keyword);
-    BooleanExpression exContent = qGuestbook.content.contains(keyword); // qdomain jpa동적인
+    BooleanExpression exContent = qGuestbook.content.contains(keyword);
     BooleanExpression exAll = exTitle.or(exContent);
     builder.and(exAll);
     builder.and(qGuestbook.gno.gt(0L)); //형식적이지만 추가해서 조건을 온전하게 함.
@@ -97,4 +97,3 @@ class GuestbookRepositoryTests {
     result.stream().forEach(guestbook -> System.out.println(guestbook));
   }
 }
-

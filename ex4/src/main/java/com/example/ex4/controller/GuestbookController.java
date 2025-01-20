@@ -22,29 +22,47 @@ public class GuestbookController {
 
   @GetMapping({"/list", "", "/"})
   public String list(PageRequestDTO pageRequestDTO, Model model) {
-    log.info("list...." + pageRequestDTO);
-
+    log.info("list..." + pageRequestDTO);
+    // result에 getList의 결과인 pageResultDTO를 리턴
     model.addAttribute("result", guestbookService.getList(pageRequestDTO));
     return "/guestbook/list";
   }
 
   @GetMapping("/register")
-  public void register() { }
+  public void register() {
+  }
 
   @PostMapping("/register")
   public String registerPost(GuestbookDTO guestbookDTO, RedirectAttributes ra) {
     Long gno = guestbookService.register(guestbookDTO);
-    ra.addFlashAttribute("msg", gno + "번 등록");
+    // RedirectAttributes는 뷰에 데이터를 전송하되 한번만 전송할수 있다.
+    ra.addFlashAttribute("msg", gno + "번 게시물이 등록");
+    // redirect는 컨트롤러의 또 다른 주소로 이동시킴
     return "redirect:/guestbook/list";
   }
 
   @GetMapping({"/read", "/modify"})
-  public void read() {
+  public void read(Long gno, PageRequestDTO pageRequestDTO, Model model) {
+    GuestbookDTO guestbookDTO = guestbookService.read(gno);
+    model.addAttribute("guestbookDTO", guestbookDTO);
+  }
 
+  @PostMapping("/modify")
+  public String modify(GuestbookDTO guestbookDTO,
+                       PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
+    Long gno = guestbookService.modify(guestbookDTO);
+    ra.addFlashAttribute("msg", gno + "번 게시물이 수정");
+    ra.addAttribute("gno", gno);
+    ra.addAttribute("page", pageRequestDTO.getPage());
+    return "redirect:/guestbook/read";
   }
 
   @PostMapping("/remove")
-  public String remove() {
-    return "/guestbook/list";
+  public String remove(GuestbookDTO guestbookDTO,
+                       PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
+    Long gno = guestbookService.remove(guestbookDTO);
+    ra.addFlashAttribute("msg", gno + "번 게시물이 삭제");
+    ra.addAttribute("page", pageRequestDTO.getPage());
+    return "redirect:/guestbook/list";
   }
 }
