@@ -59,6 +59,8 @@ public class GuestbookController {
     ra.addFlashAttribute("msg", gno + "번 게시물이 수정");
     ra.addAttribute("gno", gno);
     ra.addAttribute("page", pageRequestDTO.getPage());
+    ra.addAttribute("type", pageRequestDTO.getType());
+    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
     return "redirect:/guestbook/read";
   }
 
@@ -74,6 +76,8 @@ public class GuestbookController {
     }
     ra.addFlashAttribute("msg", gno + "번 게시물이 삭제");
     ra.addAttribute("page", pageRequestDTO.getPage());
+    ra.addAttribute("type", pageRequestDTO.getType());
+    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
     return "redirect:/guestbook/list";
   }
 }

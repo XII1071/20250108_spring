@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{layout/basic::setContent(~{this::content})}">
+    <th:block th:fragment="content">
+        <style>
+            .form-group{margin-bottom: 20px;}
+        </style>
+        <h1 class="mt-4">Guestbook Read Page</h1>
+        <form th:action="@{/guestbook/register}" th:method="post">
+            <div class="form-group">
+                <label for="title">Gno</label>
+                <input type="text" name="gno" id="gno" class="form-control" readonly
+                       th:value="${guestbookDTO.gno}">
+            </div>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" class="form-control"
+                       th:value="${guestbookDTO.title}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <input type="text" name="content" id="content" class="form-control"
+                       th:value="${guestbookDTO.content}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="title">Writer</label>
+                <input type="text" name="writer" id="writer" class="form-control"
+                       th:value="${guestbookDTO.writer}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="regDate">RegDate</label>
+                <input type="text" name="regDate" id="regDate" class="form-control" readonly
+                       th:value="${#temporals.format(guestbookDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+            </div>
+            <div class="form-group">
+                <label for="modDate">ModDate</label>
+                <input type="text" name="modDate" id="modDate" class="form-control" readonly
+                       th:value="${#temporals.format(guestbookDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+            </div>
+            <div class="form-group">
+                <a class="btn btn-primary"
+                   th:href="@{/guestbook/modify(page=${pageRequestDTO.page},gno=${guestbookDTO.gno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">Modify</a>
+                <a class="btn btn-info"
+                   th:href="@{/guestbook/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">List</a>
+            </div>
+        </form>
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            window.onload = () => {
+                var msg = [[${msg}]]
+                if(msg) {
+                    const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                    document.querySelector(".modal-body").innerHTML=`<p>${msg}되었습니다.</p>`
+                    document.querySelector("#exampleModalLabel")
+                        .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
+                    myModal.show()
+                }
+                history.replaceState({}, null, null)
+            }
+
+        </script>
+    </th:block>
+</th:block>
+
+</html>
