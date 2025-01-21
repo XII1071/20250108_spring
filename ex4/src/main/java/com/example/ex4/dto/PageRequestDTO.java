@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 public class PageRequestDTO {
   private int page; // 페이지 번호
   private int size; // 한 페이지당 갯수
+  private String type;
+  private String keyword;
 
   public PageRequestDTO() {
     this.page = 1;

@@ -4,7 +4,10 @@ import com.example.ex4.dto.GuestbookDTO;
 import com.example.ex4.dto.PageRequestDTO;
 import com.example.ex4.dto.PageResultDTO;
 import com.example.ex4.entity.Guestbook;
+import com.example.ex4.entity.QGuestbook;
 import com.example.ex4.repository.GuestbookRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -32,7 +35,11 @@ public class GuestbookServiceImpl implements GuestbookService {
   @Override
   public PageResultDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("gno").descending());
-    Page<Guestbook> page = guestbookRepository.findAll(pageable);
+
+    // 검색 조건 처리
+    BooleanBuilder booleanBuilder = getSearch(pageRequestDTO);
+    // queryDSL 지정
+    Page<Guestbook> page = guestbookRepository.findAll(booleanBuilder, pageable);
 
     Function<Guestbook, GuestbookDTO> fn = new Function<Guestbook, GuestbookDTO>() {
       @Override
@@ -67,5 +74,25 @@ public class GuestbookServiceImpl implements GuestbookService {
   public Long remove(GuestbookDTO guestbookDTO) {
     guestbookRepository.deleteById(guestbookDTO.getGno());
     return guestbookDTO.getGno();
+  }
+
+  // 검색 조건 지정을 위한 메서드
+  private BooleanBuilder getSearch(PageRequestDTO pageRequestDTO) {
+    String type = pageRequestDTO.getType();
+    String keyword = pageRequestDTO.getKeyword();
+
+    BooleanBuilder booleanBuilder = new BooleanBuilder();
+    // 동적 검색을 위한 객체를 생성
+    QGuestbook qGuestbook = QGuestbook.guestbook;
+    // 전체를 조건정의, 검색없을 경우 전체를 지정
+    BooleanExpression expression = QGuestbook.gno.gt(0L);
+    booleanBuilder.and(expression); // 첫번째 조건을 적용
+
+    BooleanBuilder conditionBuilder = new BooleanBuilder();
+    if (type.contains("t")) conditionBuilder.or(qGuestbook.title.contains(keyword));
+    if (type.contains("c")) conditionBuilder.or(qGuestbook.content.contains(keyword));
+    if (type.contains("w")) conditionBuilder.or(qGuestbook.writer.contains(keyword));
+    booleanBuilder.and(conditionBuilder);
+    return booleanBuilder;
   }
 }
