@@ -17,7 +17,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Log4j2
 @RequiredArgsConstructor
 public class GuestbookController {
-
+  // controller에서 해야 할 3가지
+  // 1) 처리해야 할 데이터를 확인한다.
+  // 2) 데이터를 처리할 핵심 로직으로 보낸다.
+  // 3) 다음 페이지에 보내야 할 자료를 처리한다.
   private final GuestbookService guestbookService;
 
   @GetMapping({"/list", "", "/"})
