@@ -5,22 +5,22 @@
         <h1 class="mt-4">Guestbook List Page
             <a class="btn btn-outline-primary" th:href="@{/guestbook/register}">Register</a>
         </h1>
-        <form th:action="@{/guestbook/list}" method="get">
+        <form th:action="@{/guestbook/list}" method="get" id="frmSrch">
             <div class="input-group">
                 <div class="input-group-prepend" style="margin-right:10px">
                     <select class="form-control" id="type" name="type">
-                        <option>선택하세요</option>
-                        <option value="t">제목</option>
-                        <option value="c">내용</option>
-                        <option value="w">작성자</option>
-                        <option value="tc">제목+내용</option>
-                        <option value="tcw">제목+내용+작성자</option>
+                        <option th:selected="${pageRequestDTO.type == null}">전체 보기</option>
+                        <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
+                        <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
+                        <option value="w" th:selected="${pageRequestDTO.type == 'w'}">작성자</option>
+                        <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
+                        <option value="tcw" th:selected="${pageRequestDTO.type == 'tcw'}">제목+내용+작성자</option>
                     </select>
                 </div>
                 <input type="text" class="form-control" name="keyword" id="keyword"
-                       style="border-radius: 5px;"/>
+                       style="border-radius: 5px;" th:value="${pageRequestDTO.keyword}"/>
                 <div class="input-group-append" style="margin-left:10px;">
-                    <button class="btn btn-outline-primary">Search</button>
+                    <button class="btn btn-outline-primary btnSrch">Search</button>
                 </div>
             </div>
         </form>
@@ -37,7 +37,10 @@
             <tr th:each="guestbookDto : ${result.dtoList}" style="cursor:pointer"
                 onmouseover="this.style.background='#d6e6ff'"
                 onmouseout="this.style.background='white'"
-                th:onclick="goRead([[${guestbookDto.gno}]], [[${result.page}]])">
+                th:onclick="goRead(
+                    [[${guestbookDto.gno}]],[[${result.page}]],
+                    [[${pageRequestDTO.type}]],[[${pageRequestDTO.keyword}]]
+                )">
                 <td>[[${guestbookDto.gno}]]</td>
                 <td>[[${guestbookDto.title}]]</td>
                 <td>[[${guestbookDto.writer}]]</td>
@@ -55,7 +58,8 @@
             </li>
             <li th:class="'page-item' +${result.page == page?' active':''} "
                 th:each="page: ${result.pageList}">
-                <a class="page-link" th:href="@{/guestbook/list(page=${page})}">[[${page}]]</a>
+                <a class="page-link"
+                   th:href="@{/guestbook/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
             </li>
             <li class="page-item" th:if="${result.next}">
                 <a class="page-link" th:href="@{/guestbook/list(page=${result.end+1})}">Next</a>
@@ -78,6 +82,7 @@
         </div>
         <script th:inline="javascript">
             window.onload = () => {
+                // 등록 후 알림창 띄우는 파트 start
                 var msg = [[${msg}]]
                 if(msg) {
                     const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
@@ -88,10 +93,44 @@
                     myModal.show()
                 }
                 history.replaceState({}, null, null)
+                // 등록 후 알림창 띄우는 파트 end
+
+                // 검색처리 start
+                frmSrch = document.querySelector("#frmSrch")
+                btnSrch = document.querySelector(".btnSrch")
+                type = document.querySelector("#type")
+                keyword = document.querySelector("#keyword")
+                btnSrch.onclick = e => {
+                    e.preventDefault()
+                    // 전체보기가 아닐 경우 keyword 값 있는지 확인
+                    if(!type.options[0].selected){
+                        if(keyword.value == "") {
+                            keyword.setAttribute('placeholder','검색어를 넣어주세요');
+                            keyword.focus();
+                            return;
+                        }
+                    }
+                    frmSrch.submit();
+                }
+                // 검색 조건(type, keyword)이 있는 경우 false, 아니면 true
+                const requestKeyword = /*[[${pageRequestDTO.keyword}]]*/'keyword'
+                keyword.disabled = requestKeyword?false:true;
+                //btnSrch.disabled = requestKeyword?false:true;
+
+                type.onchange = () => {
+                    if(type.options[0].selected){
+                        keyword.value = '';keyword.disabled = true;
+                        //btnSrch.disabled = true;
+                    } else {
+                       keyword.disabled = false;
+                       //btnSrch.disabled = false;
+                    }
+                }
+
             }
-            function goRead(gno, page){
+            function goRead(gno, page, type, keyword){
                 let url = /*[[@{/guestbook/read}]]*/'url'
-                location.href = url + `?gno=${gno}&page=${page}`
+                location.href = url + `?gno=${gno}&page=${page}&type=${type}&keyword=${keyword}`
             }
         </script>
     </th:block>

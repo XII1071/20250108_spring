@@ -39,6 +39,8 @@
             </div>
             <div class="form-group">
                 <input type="hidden" name="page" th:value="${pageRequestDTO.page}">
+                <input type="hidden" name="type" th:value="${pageRequestDTO.type}">
+                <input type="hidden" name="keyword" th:value="${pageRequestDTO.keyword}">
                 <button class="btn btn-primary btnModi">Modify</button>
                 <button class="btn btn-danger btnDele">Delete</button>
                 <button class="btn btn-info btnBack">Back</button>

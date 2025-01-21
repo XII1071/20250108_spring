@@ -85,10 +85,13 @@ public class GuestbookServiceImpl implements GuestbookService {
     // 동적 검색을 위한 객체를 생성
     QGuestbook qGuestbook = QGuestbook.guestbook;
     // 전체를 조건정의, 검색없을 경우 전체를 지정
-    BooleanExpression expression = QGuestbook.gno.gt(0L);
+    BooleanExpression expression = qGuestbook.gno.gt(0L);
     booleanBuilder.and(expression); // 첫번째 조건을 적용
 
     BooleanBuilder conditionBuilder = new BooleanBuilder();
+    if (type == null || type.trim().length() == 0) return booleanBuilder;
+    if (keyword == null || keyword.trim().length() == 0) return booleanBuilder;
+
     if (type.contains("t")) conditionBuilder.or(qGuestbook.title.contains(keyword));
     if (type.contains("c")) conditionBuilder.or(qGuestbook.content.contains(keyword));
     if (type.contains("w")) conditionBuilder.or(qGuestbook.writer.contains(keyword));
