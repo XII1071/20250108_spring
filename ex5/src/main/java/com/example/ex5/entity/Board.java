@@ -9,8 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "writer")
+public class Board extends BaseEntity {
 
-public class Board extends BaseEntity{
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long bno;
@@ -18,7 +18,9 @@ public class Board extends BaseEntity{
   private String title;
   private String content;
 
-  @ManyToOne // has-a 관계를 이용하여 foreign Key 적용
+  // has-a 관계를 이용하여 Foreign Key 적용
+  // 지연 로딩을 기본 사용하고 상황에 맞게 필요할 때 재호출 함.
+  @ManyToOne (fetch = FetchType.LAZY)
   private Member writer;
-}
 
+}
