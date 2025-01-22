@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "board")
-public class Reply extends BaseEntity{
+public class Reply extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long rno;
@@ -19,4 +19,3 @@ public class Reply extends BaseEntity{
   @ManyToOne
   Board board;
 }
-

@@ -10,8 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString
-
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
   @Id
   private String email;
 
@@ -19,4 +18,3 @@ public class Member extends BaseEntity{
 
   private String name;
 }
-
