@@ -72,4 +72,11 @@ class BoardRepositoryTests {
       System.out.println(Arrays.toString(arr));
     });
   }
+
+  @Test
+  public void testGetBoardByBno() {
+    Object result = boardRepository.getBoardByBno(10L);
+    Object[] arr = (Object[]) result;
+    for (Object object : arr) System.out.println(object);
+  }
 }
