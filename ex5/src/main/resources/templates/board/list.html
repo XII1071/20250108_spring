@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
@@ -28,10 +27,10 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th style="width: 20%">#</th>
-                <th style="width: 35%">Title</th>
-                <th style="width: 25%">Writer</th>
-                <th style="width: 20%">RegDate</th>
+                <th>#</th>
+                <th>Title</th>
+                <th>Writer</th>
+                <th>RegDate</th>
             </tr>
             </thead>
             <tbody>
@@ -44,9 +43,10 @@
                 )">
                 <td>[[${boardDto.bno}]]</td>
                 <td>[[${boardDto.title}]]</td>
-                <td>[[${boardDto.writerName}]] <small>[[${boardDto.writerEmail}]]</small></td>
+                <td>[[${boardDto.writerName}]]<small>[[${boardDto.writerEmail}]]</small></td>
                 <td>[[${#temporals.format(boardDto.regDate,
-                    'yyyy/MM/dd HH:mm')}]]</td>
+                    'yyyy/MM/dd hh:mm')}]]
+                </td>
             </tr>
             </tbody>
         </table>
@@ -58,7 +58,8 @@
             </li>
             <li th:class="'page-item' +${result.page == page?' active':''} "
                 th:each="page: ${result.pageList}">
-                <a class="page-link" th:href="@{/board/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
+                <a class="page-link"
+                   th:href="@{/board/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
             </li>
             <li class="page-item" th:if="${result.next}">
                 <a class="page-link" th:href="@{/board/list(page=${result.end+1})}">Next</a>
@@ -118,7 +119,7 @@
 
                 type.onchange = () => {
                     if(type.options[0].selected){
-                        keyword.value = '';<key></key>word.disabled = true;
+                        keyword.value = '';keyword.disabled = true;
                         //btnSrch.disabled = true;
                     } else {
                        keyword.disabled = false;

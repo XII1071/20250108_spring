@@ -52,7 +52,37 @@ public class BoardServiceImpl implements BoardService {
     return board.getBno();
   }
 
+  @Override
+  public BoardDTO read(Long bno) {
+    // 1) DB에서 'bno'에 해당하는 게시글(Board) 엔티티를 찾아옴.
+    //    결과가 없을 수도 있으므로, findById()는 Optional<Board>를 반환.
+    Optional<Board> result = boardRepository.findById(bno);
 
+    // 2) Optional<Board>인 'result'에서 'Board' 객체를 꺼낼 때 result.get() 사용.
+    //    - 데이터가 존재하면 'Board' 엔티티 객체를 반환.
+    //    - 데이터가 존재하지 않으면 NoSuchElementException 발생.
+    // 3) result.get()을 두 번 사용해서 첫 번째 파라미터(Board), 두 번째 파라미터(작성자)로 각각 전달.
+    //    첫 번째 파라미터 : 게시글 엔티티 (Board)
+    //    두 번째 파라미터 : 게시글 엔티티에서 'getWriter()'로 가져온 작성자(Member)
+    //
+    // 4) replyRepository.count()는 '전체 댓글 수'를 반환할 가능성이 높음.
+    //    - 만약 특정 게시글에 달린 댓글 수를 원한다면,
+    //      'replyRepository.countByBoard(bno)' 같은 메서드를 추가로 구현해야 할 수도 있음.
+    //    - 지금은 예시이므로, 단순히 '전체 댓글 개수'일 수도 있음.
+    //
+    // 5) 최종적으로 DTO로 변환하는 메서드(entityToDto)를 호출하여
+    //    BoardDTO 객체를 만들어 반환.
+
+    /*
+    * 내가 생각한 정리
+    * result.get().getWriter()이 result.get()Board 타입이고
+    * BoardService 에 Board 타입 .writer 하면 멤버 타입을 가지고 올수 있기때문에 result.get().getWriter() 이다.
+    * replyRepository.count
+    * 위에가보면 private final ReplyRepository replyRepository; 선언했기에
+    * 기본적으로 count()라는 메서드를 데리고 온것
+    *  */
+    return entityToDto(result.get(), result.get().getWriter(), replyRepository.count());
+  }
 
   @Override
   public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
@@ -112,7 +142,7 @@ public class BoardServiceImpl implements BoardService {
 
 
   @Override
-  public void modify(BoardDTO boardDTO) {
+  public Long modify(BoardDTO boardDTO) {
     // 1) DB에서 수정 대상이 될 Board(게시글) 엔티티를 찾아옵니다.
     //    findById(식별자값)은 Optional<T>를 반환하므로, 데이터를 찾지 못하면 빈 Optional이 돌아올 수 있습니다.
     Optional<Board> result = boardRepository.findById(boardDTO.getBno());
@@ -135,6 +165,7 @@ public class BoardServiceImpl implements BoardService {
       boardRepository.save(board);
     }
     // 7) if 조건에 해당하지 않으면(=게시글을 못 찾은 경우), 별도의 처리 없이 메서드를 종료합니다.
+    return null;
   }
 
   @Transactional  // 트랜잭션 처리

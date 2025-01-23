@@ -35,6 +35,8 @@ public interface BoardService {
   Long register(BoardDTO boardDTO);
   PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
   BoardDTO get(Long bno);
-  void modify(BoardDTO boardDTO);
+  BoardDTO read(Long bno);
+  Long modify(BoardDTO boardDTO);
   void removeWithReplies(Long bno);
+
 }
