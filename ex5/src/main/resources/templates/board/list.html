@@ -1,11 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
     <th:block th:fragment="content">
         <h1 class="mt-4">Board List Page
-            <a class="btn btn-outline-primary" th:href="@{/Board/register}">Register</a>
+            <a class="btn btn-outline-primary" th:href="@{/board/register}">Register</a>
         </h1>
-        <form th:action="@{/Board/list}" method="get" id="frmSrch">
+        <form th:action="@{/board/list}" method="get" id="frmSrch">
             <div class="input-group">
                 <div class="input-group-prepend" style="margin-right:10px">
                     <select class="form-control" id="type" name="type">
@@ -34,17 +35,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="BoardDto : ${result.dtoList}" style="cursor:pointer"
+            <tr th:each="boardDto : ${result.dtoList}" style="cursor:pointer"
                 onmouseover="this.style.background='#d6e6ff'"
                 onmouseout="this.style.background='white'"
                 th:onclick="goRead(
-                    [[${BoardDto.bno}]],[[${result.page}]],
+                    [[${boardDto.bno}]],[[${result.page}]],
                     [[${pageRequestDTO.type}]],[[${pageRequestDTO.keyword}]]
                 )">
-                <td>[[${BoardDto.bno}]]</td>
-                <td>[[${BoardDto.title}]]</td>
-                <td>[[${BoardDto.writerName}]]<small>[[${boardDto.writerEmail}]]</small></td>
-                <td>[[${#temporals.format(BoardDto.regDate,
+                <td>[[${boardDto.bno}]]</td>
+                <td>[[${boardDto.title}]]</td>
+                <td>[[${boardDto.writerName}]]<small>[[${boardDto.writerEmail}]]</small></td>
+                <td>[[${#temporals.format(boardDto.regDate,
                     'yyyy/MM/dd hh:mm')}]]</td>
             </tr>
             </tbody>
@@ -52,15 +53,15 @@
         <ul class="pagination h-100 justify-content-center align-items-center">
             <li class="page-item" th:if="${result.prev}">
                 <a class="page-link" tabindex="-1"
-                   th:href="@{/Board/list(page=${result.start-1})}"
+                   th:href="@{/board/list(page=${result.start-1})}"
                 >Prev</a>
             </li>
             <li th:class="'page-item' +${result.page == page?' active':''} "
                 th:each="page: ${result.pageList}">
-                <a class="page-link" th:href="@{/Board/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
+                <a class="page-link" th:href="@{/board/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
             </li>
             <li class="page-item" th:if="${result.next}">
-                <a class="page-link" th:href="@{/Board/list(page=${result.end+1})}">Next</a>
+                <a class="page-link" th:href="@{/board/list(page=${result.end+1})}">Next</a>
             </li>
         </ul>
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -117,7 +118,7 @@
 
                 type.onchange = () => {
                     if(type.options[0].selected){
-                        keyword.value = '';keyword.disabled = true;
+                        keyword.value = '';<key></key>word.disabled = true;
                         //btnSrch.disabled = true;
                     } else {
                        keyword.disabled = false;
@@ -127,7 +128,7 @@
 
             }
             function goRead(bno, page, type, keyword){
-                let url = /*[[@{/Board/read}]]*/'url'
+                let url = /*[[@{/board/read}]]*/'url'
                 location.href = url + `?bno=${bno}&page=${page}&type=${type}&keyword=${keyword}`
             }
         </script>
