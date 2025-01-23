@@ -18,9 +18,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-@Service            // 스프링이 이 클래스를 "서비스 계층"의 컴포넌트로 인식하게 하는 어노테이션
-@RequiredArgsConstructor // Lombok을 사용해, 클래스의 모든 'final' 필드를 파라미터로 받는 생성자를 자동 생성
-@Log4j2            // Lombok을 사용해, Log4j2 로깅 기능을 쉽게 사용할 수 있도록 해주는 어노테이션
+@Service
+// 스프링이 이 클래스를 "서비스 계층"의 컴포넌트로 인식하게 하는 어노테이션
+@RequiredArgsConstructor
+// Lombok을 사용해, 클래스의 모든 'final' 필드를 파라미터로 받는 생성자를 자동 생성
+@Log4j2
+// Lombok을 사용해, Log4j2 로깅 기능을 쉽게 사용할 수 있도록 해주는 어노테이션
 public class BoardServiceImpl implements BoardService {
 
   // Board(게시판) 데이터 처리를 위한 레포지토리
@@ -29,7 +32,7 @@ public class BoardServiceImpl implements BoardService {
   // Reply(댓글) 데이터 처리를 위한 레포지토리
   private final ReplyRepository replyRepository;
 
-  /**
+  /*
    * 게시글 등록 메서드
    * @param boardDTO : 등록하고자 하는 게시글 정보를 담은 DTO
    * @return 등록 후 생성된 게시글의 PK(식별자, bno)
