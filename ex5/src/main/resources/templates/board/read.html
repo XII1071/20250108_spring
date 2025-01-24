@@ -5,10 +5,10 @@
         <style>
             .form-group{margin-bottom: 20px;}
         </style>
-        <h1 class="mt-4">board Read Page</h1>
+        <h1 class="mt-4">Board Read Page</h1>
         <form th:action="@{/board/register}" th:method="post">
             <div class="form-group">
-                <label for="title">bno</label>
+                <label for="title">Bno</label>
                 <input type="text" name="bno" id="bno" class="form-control" readonly
                        th:value="${boardDTO.bno}">
             </div>
@@ -23,6 +23,11 @@
                        th:value="${boardDTO.content}" readonly>
             </div>
             <div class="form-group">
+                <label for="title">WriterName</label>
+                <input type="text" name="writerName" id="writerName" class="form-control"
+                       th:value="${boardDTO.writerName}" readonly>
+            </div>
+            <div class="form-group">
                 <label for="title">Writer</label>
                 <input type="text" name="writerEmail" id="writerEmail" class="form-control"
                        th:value="${boardDTO.writerEmail}" readonly>
@@ -30,18 +35,25 @@
             <div class="form-group">
                 <label for="regDate">RegDate</label>
                 <input type="text" name="regDate" id="regDate" class="form-control" readonly
-                  th:value="${#temporals.format(boardDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(boardDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
                 <input type="text" name="modDate" id="modDate" class="form-control"readonly
-                  th:value="${#temporals.format(boardDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(boardDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <a class="btn btn-primary" th:href="@{/board/modify(page=${pageRequestDTO.page},bno=${boardDTO.bno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Modify</a>
                 <a class="btn btn-info" th:href="@{/board/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >List</a>
             </div>
         </form>
+        <div class="mt-4">
+            <span class="btn btn-outline-secondary addReply">Add Reply</span>
+            <span style="font-size:9pt">댓글:
+            <span id="repCnt" th:text="${boardDTO.replyCount}"></span> 개
+            </span>
+        </div>
+        <div class="list-group replyList"></div>
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -68,8 +80,51 @@
                     document.querySelector("#exampleModalLabel")
                         .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
                     myModal.show()
+                    history.replaceState({}, null, null)
                 }
-                history.replaceState({}, null, null)
+                loadReplyJSON()
+            }
+            function loadReplyJSON(){
+                const replyListGroup = document.querySelector(".replyList")
+                const url = /*[[@{/replies/board/}]]*/'url'
+                const bno = [[${boardDTO.bno}]]
+                fetch(url+bno, {method: 'GET',})
+                .then(response => response.json())
+                .then(data => {
+                    //console.log(data)
+                    let str = "";
+                    for(let i=0;i<data.length;i++){
+                        str += `
+                            <div class="card-body form-control mb-1"
+                            onmouseover="this.style.background='#d6e6ff'"
+                            onmouseout="this.style.background='white'"
+                            data-rno="${data[i].rno}" data-text="${data[i].text}"
+                            data-replyer="${data[i].replyer}"
+                            style="padding:5px 20px;cursor:pointer;">
+                                <div style="display:inline-block;width:49%">
+                                    <h6 style="display:inline-block;width:70px">${data[i].rno}</h6>
+                                    <h5 class="card-text" style="display:inline-block;">${data[i].text}</h5>
+                                </div>
+                                <div style="display:inline-block;width:48%;text-align:right;right-padding:20px;">
+                                    <span class="card-subtitle text-muted">${data[i].replyer}</span>
+                                    <span class="card-subtitle text-muted"
+                                    style="display:inline-block;width:150px;color:rgb(148, 163, 184);"
+                                    >${formatDateTime(data[i].regDate)}</span>
+                                </div>
+                            </div>
+                        `
+                    }
+                replyListGroup.innerHTML = str
+                })
+            }
+            function formatDateTime(str) {
+              const date = new Date(str)
+              return `${date.getFullYear()}/${len2(date.getMonth()+1)}`
+                 + `/${len2(date.getDate())} ${len2(date.getHours())}:`
+                 + `${len2(date.getMinutes())}`
+            }
+            function len2(num) {
+              return (num<10) ? "0"+num : num;
             }
 
         </script>

@@ -1,4 +1,3 @@
-
 package com.example.ex5.repository;
 
 import com.example.ex5.entity.Board;

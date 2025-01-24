@@ -18,4 +18,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
   // 쿼리메서드로 구성
   List<Reply> getRepliesByBoardOrderByRno(Board board);
+
 }

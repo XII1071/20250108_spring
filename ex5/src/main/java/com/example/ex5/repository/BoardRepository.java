@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long>
-    , SearchBoardRepository { // SearchBoardRepository는 복수개의 엔티티에 대한 동적 검색 위함.
+    , SearchBoardRepository {  //SearchBoardRepository는 복수개의 엔티티에 대한 동적 검색 위함.
 
   /*
   JPQL  :: JPA(Java Persistence API)에서 사용하는 객체지향 쿼리 언어

@@ -16,17 +16,16 @@ public interface ReplyService {
   void remove(Long rno);
 
   default Reply dtoToEntity(ReplyDTO replyDTO) {
-    Board board = Board.builder().bno(replyDTO.getBno()).build();
     Reply reply = Reply.builder()
         .rno(replyDTO.getRno())
         .text(replyDTO.getText())
         .replyer(replyDTO.getReplyer())
-        .board(board)
+        .board(Board.builder().bno(replyDTO.getBno()).build())
         .build();
     return reply;
-    }
+  }
 
-    // board 객체를 게시할 이유가 없어서 bno는 제외
+  // Board 객체를 게시할 이유가 없어서 bno는 제외
   default ReplyDTO entityToDto(Reply reply) {
     ReplyDTO replyDTO = ReplyDTO.builder()
         .rno(reply.getRno())
@@ -37,5 +36,4 @@ public interface ReplyService {
         .build();
     return replyDTO;
   }
-
 }

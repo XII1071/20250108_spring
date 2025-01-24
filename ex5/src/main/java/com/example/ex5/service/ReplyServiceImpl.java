@@ -8,12 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReplyServiceImpl implements ReplyService{
+public class ReplyServiceImpl implements ReplyService {
   private final ReplyRepository replyRepository;
 
   @Override
@@ -33,14 +32,11 @@ public class ReplyServiceImpl implements ReplyService{
 
   @Override
   public void modify(ReplyDTO replyDTO) {
-    Reply reply = dtoToEntity(replyDTO);
-    replyRepository.save(reply);
-
+    replyRepository.save(dtoToEntity(replyDTO));
   }
 
   @Override
   public void remove(Long rno) {
     replyRepository.deleteById(rno);
   }
-
 }
