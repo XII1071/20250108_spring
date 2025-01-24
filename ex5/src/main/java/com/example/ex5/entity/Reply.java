@@ -10,12 +10,14 @@ import lombok.*;
 @Getter
 @ToString(exclude = "board")
 public class Reply extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long rno;
+
   private String text;
   private String replyer;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   Board board;
 }

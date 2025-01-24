@@ -86,14 +86,22 @@ public class BoardServiceImpl implements BoardService {
 
   @Override
   public PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+    log.info(">>"+pageRequestDTO);
     // 1. 레포지토리 메서드 호출
     // boardRepository.getBoardWithReplyCount(...)가 무엇을 반환하느냐에 따라
     // 'Page<Object[]>' 형태로 결과를 받습니다.
     // 즉, 조회 시 Board 엔티티, Member 엔티티, 그리고 댓글 수(Long)와 같은
     // 여러 데이터(컬럼)를 함께 얻기 위해 하나의 'Object[]'에 담아 리턴하는 방식입니다.
-    Page<Object[]> result = boardRepository.getBoardWithReplyCount(
-            pageRequestDTO.getPageable(Sort.by("bno").descending())
+
+    /* Querydsl(동적검색)이 없는 페이징 처리 */
+    Page<Object[]> result = boardRepository.searchPage(
+        pageRequestDTO.getType(),
+        pageRequestDTO.getKeyword(),
+        pageRequestDTO.getPageable(Sort.by("bno").descending())
     );
+//    Page<Object[]> result = boardRepository.getBoardWithReplyCount(
+//            pageRequestDTO.getPageable(Sort.by("bno").descending())
+//    );
     // -> pageable(...) 메서드로 PageRequestDTO에 들어있는 페이지/사이즈 정보를 꺼내고,
     //    정렬 기준으로 "bno"를 내림차순(descending) 정렬하도록 설정했습니다.
 
@@ -142,7 +150,7 @@ public class BoardServiceImpl implements BoardService {
 
 
   @Override
-  public Long modify(BoardDTO boardDTO) {
+  public void modify(BoardDTO boardDTO) {
     // 1) DB에서 수정 대상이 될 Board(게시글) 엔티티를 찾아옵니다.
     //    findById(식별자값)은 Optional<T>를 반환하므로, 데이터를 찾지 못하면 빈 Optional이 돌아올 수 있습니다.
     Optional<Board> result = boardRepository.findById(boardDTO.getBno());
@@ -165,7 +173,6 @@ public class BoardServiceImpl implements BoardService {
       boardRepository.save(board);
     }
     // 7) if 조건에 해당하지 않으면(=게시글을 못 찾은 경우), 별도의 처리 없이 메서드를 종료합니다.
-    return null;
   }
 
   @Transactional  // 트랜잭션 처리
