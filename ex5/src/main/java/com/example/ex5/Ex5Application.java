@@ -11,6 +11,7 @@ public class Ex5Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Ex5Application.class, args);
 		System.out.println("http://localhost:8080/ex5");
+		System.out.println("코드저장");
 	}
 
 }
