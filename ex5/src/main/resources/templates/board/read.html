@@ -240,6 +240,8 @@
                     document.querySelector(".modal-body").innerHTML = `${data} 알림`
                     document.querySelector(".modal-footer .modify").style.display = 'none'
                     document.querySelector(".modal-footer .remove").style.display = 'none'
+                    let cnt = document.querySelector("#repCnt")
+                    cnt.textContent = parseInt(cnt.textContent) - 1;
                     loadReplyJSON()
                 })
                 myModal.show()
