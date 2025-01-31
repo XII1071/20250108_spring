@@ -5,13 +5,16 @@ import com.example.ex5.entity.Board;
 import com.example.ex5.entity.Reply;
 import com.example.ex5.repository.ReplyRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ReplyServiceImpl implements ReplyService {
   private final ReplyRepository replyRepository;
 
@@ -32,7 +35,13 @@ public class ReplyServiceImpl implements ReplyService {
 
   @Override
   public void modify(ReplyDTO replyDTO) {
-    replyRepository.save(dtoToEntity(replyDTO));
+    log.info(replyDTO);
+    Optional<Reply> result = replyRepository.findById(replyDTO.getRno());
+    if(result.isPresent()){
+      Reply reply = result.get();
+      reply.changeText(replyDTO.getText());
+      replyRepository.save(reply);
+    }
   }
 
   @Override

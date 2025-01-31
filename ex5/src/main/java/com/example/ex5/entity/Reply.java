@@ -18,4 +18,6 @@ public class Reply extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   Board board;
+
+  public void changeText(String text) {this.text = text;}
 }

@@ -53,7 +53,7 @@
             <span id="repCnt" th:text="${boardDTO.replyCount}"></span> 개
             </span>
         </div>
-        <div class="list-group replyList"></div>
+        <div class="list-group replyList" style="margin: 20px 0;"></div>
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -72,24 +72,27 @@
         </div>
         <script th:inline="javascript">
             const bno = [[${boardDTO.bno}]]
+
             window.onload = () => {
-            // 수정후 변경사항을 위한 modal
+                // 수정후 변경사항을 위한 모달
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+
                 var msg = [[${msg}]]
                 if(msg) {
-                    const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
-                    {backdrop: true});
                     document.querySelector(".modal-body").innerHTML=`<p>${msg}되었습니다.</p>`
                     document.querySelector("#exampleModalLabel")
                         .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
                     myModal.show()
                     history.replaceState({}, null, null)
                 }
-                loadReplyJSON() // 댓글을 REST 하게 불러오는 함수
+                loadReplyJSON() // 댓글을 REST하게 불러오는 함수
                 document.querySelector(".addReply").onclick = btnAddFnc
             }
             function loadReplyJSON(){
                 const replyListGroup = document.querySelector(".replyList")
                 const url = /*[[@{/replies/board/}]]*/'url'
+
                 fetch(url+bno, {method: 'GET',})
                 .then(response => response.json())
                 .then(data => {
@@ -102,7 +105,9 @@
                             onmouseout="this.style.background='white'"
                             data-rno="${data[i].rno}" data-text="${data[i].text}"
                             data-replyer="${data[i].replyer}"
-                            style="padding:5px 20px;cursor:pointer;">
+                            style="padding:5px 20px;cursor:pointer;"
+                            onclick="replyModal('${data[i].rno}','${data[i].text}','${data[i].replyer}')"
+                            >
                                 <div style="display:inline-block;width:49%">
                                     <h6 style="display:inline-block;width:70px">${data[i].rno}</h6>
                                     <h5 class="card-text" style="display:inline-block;">${data[i].text}</h5>
@@ -129,7 +134,7 @@
               return (num<10) ? "0"+num : num;
             }
             function btnAddFnc(){
-                // 댓글 추가
+                //댓글 추가
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
                     {backdrop: true});
                 document.querySelector("#exampleModalLabel").textContent = "댓글 추가 창"
@@ -141,31 +146,104 @@
                     <button type="button" class="btn btn-primary save">등록</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 `
+                myModal.show() // 댓글 입력을 위한 모달
+
+                // 댓글 등록 버튼
                 document.querySelector(".modal-footer .save").onclick = () => {
                     let text = document.querySelector(".modal-body input[name='text']")
                     let replyer = document.querySelector(".modal-body input[name='replyer']")
                     if(!text.value) {
-                        text.setAttribute('placeholder', '댓글 내용을 확인하세요')
+                        text.setAttribute('placeholder', '댓글을 확인하세요')
                         text.focus()
                         return;
                     }
                     if(!replyer.value) {
                         replyer.setAttribute('placeholder', '작성자를 확인하세요')
-                        replyer.focus()
+                        replyer.focus();
                         return;
                     }
                     let reply = {bno: bno, text: text.value, replyer: replyer.value}
                     //alert(JSON.stringify(reply))
-                    const url = /*[[@{replies}]]*/'url'
+                    const url = /*[[@{/replies}]]*/'url'
                     fetch(url, {
                         method: 'POST', headers:{'Content-type': 'application/json'},
                         body: JSON.stringify(reply)
                     })
+                    .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                    .then(function(data){
+                        document.querySelector("#exampleModalLabel").textContent = "댓글 등록 완료"
+                        document.querySelector(".modal-body").innerHTML = `${data} 알림`
+                        document.querySelector(".modal-footer .save").style.display = 'none'
+                        let cnt = document.querySelector("#repCnt")
+                        cnt.textContent = parseInt(cnt.textContent) + 1;
+                        loadReplyJSON()
+                    })
+                    myModal.show() // 댓글 등록 완료 모달
                 }
-
+            }
+            function replyModal(rno, text, replyer) {
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                document.querySelector("#exampleModalLabel").textContent = rno +"번 댓글 보기"
+                document.querySelector(".modal-body").innerHTML = `
+                    <input type="text" class="form-control" name="rno" value="${rno}" readonly>
+                    <input type="text" class="form-control" name="text" value="${text}">
+                    <input type="text" class="form-control" name="replyer" value="${replyer}" readonly>
+                `
+                document.querySelector(".modal-footer").innerHTML = `
+                    <button type="button" class="btn btn-danger remove" data-bs-dismiss="modal" onclick="repRemove('${rno}')">삭제</button>
+                    <button type="button" class="btn btn-warning modify" data-bs-dismiss="modal" onclick="repModify('${rno}')">수정</button>
+                    <span class="btn btn-secondary" data-bs-dismiss="modal">닫기</span>
+                `
+                myModal.show() // 댓글 입력을 위한 모달
+            }
+            function repModify(rno) {
+                // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                let text = document.querySelector(".modal-body input[name='text']")
+                if(!text.value) {
+                    text.setAttribute('placeholder', '댓글을 확인하세요')
+                    text.focus()
+                    return;
+                }
+                let reply = {rno: rno, text: text.value}
+                //alert(JSON.stringify(reply))
+                const url = /*[[@{/replies}]]*/'url'
+                fetch(url, {
+                    method: 'PUT', headers:{'Content-type': 'application/json'},
+                    body: JSON.stringify(reply)
+                })
+                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                .then(function(data){
+                    document.querySelector("#exampleModalLabel").textContent = "댓글 수정 완료"
+                    document.querySelector(".modal-body").innerHTML = `${data} 알림`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                    loadReplyJSON()
+                })
                 myModal.show()
             }
-
+            function repRemove(rno) {
+                // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                let reply = {rno: rno}
+                const url = /*[[@{/replies}]]*/'url'
+                fetch(url, {
+                    method: 'DELETE', headers:{'Content-type': 'application/json'},
+                    body: JSON.stringify(reply)
+                })
+                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                .then(function(data){
+                    document.querySelector("#exampleModalLabel").textContent = "댓글 삭제 완료"
+                    document.querySelector(".modal-body").innerHTML = `${data} 알림`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                    loadReplyJSON()
+                })
+                myModal.show()
+            }
 
         </script>
     </th:block>
