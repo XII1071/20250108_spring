@@ -175,8 +175,8 @@
                     let cnt = document.querySelector("#repCnt")
                     cnt.textContent = parseInt(cnt.textContent) + 1;
                     myModal.show() // 댓글 등록 완료 모달
+                    loadReplyJSON()
                 })
-                loadReplyJSON()
             }
 
             function repRead(rno, text, replyer) {
@@ -217,8 +217,8 @@
                     document.querySelector(".modal-footer .modify").style.display = 'none'
                     document.querySelector(".modal-footer .remove").style.display = 'none'
                     myModal.show()
+                    loadReplyJSON()
                 })
-                loadReplyJSON()
             }
             function repRemove(rno) {
                 // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
@@ -235,11 +235,11 @@
                     document.querySelector(".modal-body").innerHTML = `${data} 알림`
                     document.querySelector(".modal-footer .modify").style.display = 'none'
                     document.querySelector(".modal-footer .remove").style.display = 'none'
-                    myModal.show()
                     let cnt = document.querySelector("#repCnt")
                     cnt.textContent = parseInt(cnt.textContent) - 1;
+                    myModal.show()
+                    loadReplyJSON()
                 })
-                loadReplyJSON()
             }
 
         </script>
