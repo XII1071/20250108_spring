@@ -71,6 +71,7 @@
             </div>
         </div>
         <script th:inline="javascript">
+            const bno = [[${boardDTO.bno}]]
             window.onload = () => {
             // 수정후 변경사항을 위한 modal
                 var msg = [[${msg}]]
@@ -89,7 +90,6 @@
             function loadReplyJSON(){
                 const replyListGroup = document.querySelector(".replyList")
                 const url = /*[[@{/replies/board/}]]*/'url'
-                const bno = [[${boardDTO.bno}]]
                 fetch(url+bno, {method: 'GET',})
                 .then(response => response.json())
                 .then(data => {
@@ -141,6 +141,28 @@
                     <button type="button" class="btn btn-primary save">등록</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 `
+                document.querySelector(".modal-footer .save").onclick = () => {
+                    let text = document.querySelector(".modal-body input[name='text']")
+                    let replyer = document.querySelector(".modal-body input[name='replyer']")
+                    if(!text.value) {
+                        text.setAttribute('placeholder', '댓글 내용을 확인하세요')
+                        text.focus()
+                        return;
+                    }
+                    if(!replyer.value) {
+                        replyer.setAttribute('placeholder', '작성자를 확인하세요')
+                        replyer.focus()
+                        return;
+                    }
+                    let reply = {bno: bno, text: text.value, replyer: replyer.value}
+                    //alert(JSON.stringify(reply))
+                    const url = /*[[@{replies}]]*/'url'
+                    fetch(url, {
+                        method: 'POST', headers:{'Content-type': 'application/json'},
+                        body: JSON.stringify(reply)
+                    })
+                }
+
                 myModal.show()
             }
 
