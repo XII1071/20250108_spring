@@ -236,6 +236,8 @@
                     document.querySelector(".modal-footer .modify").style.display = 'none'
                     document.querySelector(".modal-footer .remove").style.display = 'none'
                     myModal.show()
+                    let cnt = document.querySelector("#repCnt")
+                    cnt.textContent = parseInt(cnt.textContent) - 1;
                 })
                 loadReplyJSON()
             }
