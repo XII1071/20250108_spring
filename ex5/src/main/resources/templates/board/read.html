@@ -119,7 +119,7 @@
                             </div>
                         `
                     }
-                replyListGroup.innerHTML = str
+                    replyListGroup.innerHTML = str
                 })
             }
             function formatDateTime(str) {
@@ -147,6 +147,7 @@
             }
             function repSave() {
                 // 댓글 등록 버튼
+                // 모달이 떠 있는 상태에서 등록 버튼누른 후 또 모달이 떠야 하기 때문에 모달을 초기화함.
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 let text = document.querySelector(".modal-body input[name='text']")
                 let replyer = document.querySelector(".modal-body input[name='replyer']")
