@@ -72,6 +72,7 @@
         </div>
         <script th:inline="javascript">
             window.onload = () => {
+            // 수정후 변경사항을 위한 modal
                 var msg = [[${msg}]]
                 if(msg) {
                     const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
@@ -82,7 +83,8 @@
                     myModal.show()
                     history.replaceState({}, null, null)
                 }
-                loadReplyJSON()
+                loadReplyJSON() // 댓글을 REST 하게 불러오는 함수
+                document.querySelector(".addReply").onclick = btnAddFnc
             }
             function loadReplyJSON(){
                 const replyListGroup = document.querySelector(".replyList")
@@ -126,6 +128,22 @@
             function len2(num) {
               return (num<10) ? "0"+num : num;
             }
+            function btnAddFnc(){
+                // 댓글 추가
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                document.querySelector("#exampleModalLabel").textContent = "댓글 추가 창"
+                document.querySelector(".modal-body").innerHTML = `
+                    <input type="text" class="form-control" name="text" placeholder="댓글...">
+                    <input type="text" class="form-control" name="replyer" value="user50@a.a">
+                `
+                document.querySelector(".modal-footer").innerHTML = `
+                    <button type="button" class="btn btn-primary save">등록</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                `
+                myModal.show()
+            }
+
 
         </script>
     </th:block>
