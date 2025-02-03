@@ -11,6 +11,11 @@ import org.springframework.data.jpa.repository.Query;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     /* Object[]를 쓴이유  복수개의 엔티티(movie, review, MovieImage)를 받기위해서 */
-    @Query("select m, avg(coalesce(r.grade, 0)) from Movie m left outer join Review r " + "left outer join")
-    Page<Object[]>getListPage(Pageable pageable);
+//    @Query("select m, avg(coalesce(r.grade, 0)), count(distinct r) " +
+//        "from Movie m left outer join Review r " +
+//        "on r.movie = group by m ")
+        @Query("select m, avg(coalesce(r.grade, 0)), count(distinct r) " +
+        "from Movie m " +
+        " left outer join Review r on r.movie = group by m ")
+    Page<Object[]> getListPage(Pageable pageable);
 }
