@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>UploadEx</h1>
+<input type="file" name="uploadFiles" multiple/>
+<button type="submit" class="uploadBtn">Upload</button>
+</body>
+<script th:inline="javascript">
+    let formData = new FormData();
+    const inputFiles = document.querySelector("input[type='file']")
+    document.querySelector(".uploadBtn").onclick = () => {
+        let files = inputFiles.files;
+        for(let i=0;i<files.length;i++) {
+            console.log(files[i])
+            formData.append("uploadFiles", files[i])
+        }
+        const url = /*[[@{/uploadAjax}]]*/'url'
+        fetch(url, {
+            method: 'POST', body: formData, dataType: 'json',
+        })
+        .then(res => res.json())
+        .then(json => {console.log(json)})
+        .catch(err => console.log("Error occurred: " , err))
+    }
+</script>
+</html>

@@ -16,13 +16,14 @@ class MemberRepositoryTests {
 
   @Test
   public void insertMembers() {
-    IntStream.rangeClosed(1, 100).forEach(i -> {
+    IntStream.rangeClosed(1, 100).forEach(i->{
       Member member = Member.builder()
-          .email("r"+i+"@r.r")
-          .pw("1")
-          .nickname("reviewer" + i)
-          .build();
+              .email("r"+i+"@r.r")
+              .pw("1")
+              .nickname("reviewer" + i)
+              .build();
       memberRepository.save(member);
     });
   }
+
 }
