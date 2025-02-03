@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class MovieImageRepositoryTests {
+class MovieRepositoryTests {
 
   @Autowired
   private MovieRepository movieRepository;
@@ -31,15 +31,15 @@ class MovieImageRepositoryTests {
   @Transactional
   @Commit
   public void insertMovies() {
-    IntStream.rangeClosed(1, 100).forEach(i -> {
+    IntStream.rangeClosed(1,100).forEach(i ->{
       Movie movie = Movie.builder().title("Movie..." + i).build();
       movieRepository.save(movie);
-      int count = (int) (Math.random() * 5) + 1;
+      int count = (int)(Math.random()*5) + 1;
       for (int j = 0; j < count; j++) {
         MovieImage movieImage = MovieImage.builder()
             .uuid(UUID.randomUUID().toString())
             .movie(movie)
-            .imgName("test"+j+"jpg")
+            .imgName("test"+j+".jpg")
             .build();
         movieImageRepository.save(movieImage);
       }
@@ -47,9 +47,28 @@ class MovieImageRepositoryTests {
   }
 
   @Test
-  public void testListPage() {
-    PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+  public void testGetListPage() {
+    PageRequest pageRequest =
+        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
     Page<Object[]> result = movieRepository.getListPage(pageRequest);
+    for (Object[] objects : result.getContent()) {
+      System.out.println(Arrays.toString(objects));
+    }
+  }
+  @Test
+  public void testGetListPageImg() {
+    PageRequest pageRequest =
+        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+    Page<Object[]> result = movieRepository.getListPageImg(pageRequest);
+    for (Object[] objects : result.getContent()) {
+      System.out.println(Arrays.toString(objects));
+    }
+  }
+  @Test
+  public void testGetListPageMaxImg() {
+    PageRequest pageRequest =
+        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+    Page<Object[]> result = movieRepository.getListPageMaxImg(pageRequest);
     for (Object[] objects : result.getContent()) {
       System.out.println(Arrays.toString(objects));
     }
