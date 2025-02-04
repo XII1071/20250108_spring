@@ -4,6 +4,13 @@
     <th:block th:fragment="content">
         <style>
             .form-group{margin-bottom: 30px;}
+            .uploadResult {width: 100%;background:gray;margin-top:10px;}
+            .uploadResult ul {
+                display: flex; flex-flow:row; justify-content:center;
+                align-items;center;vertical-align:top;overflow: auto;
+            }
+            .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
+            .uploadResult ul li img {width: 100px;}
         </style>
         <h1 class="mt-4">Movie Register Page</h1>
         <form th:action="@{/movie/register}" th:method="post">
@@ -20,10 +27,10 @@
             </div>
             <div class="box"></div><!-- 전송버튼을 누를 때 사용 -->
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" id="btnSend" class="btn btn-primary">Submit</button>
             </div>
         </form>
-        <div class="uploadResult"><ul></ul></div><!-- 파일을 추가할 때 사용 -->
+        <div class="uploadResult"><ul></ul></div><!-- 파일을 추가해서 이미지 보일 때 사용 -->
         <script th:inline="javascript">
             function checkExtension(fileName, fileSize){
                 maxSize = 1024*1024*10;
@@ -45,12 +52,11 @@
                 let isExtension = false;
                 for(let i=0;i<files.length;i++) {
                     //console.log(files[i])
-                    if(!checkExtension(this.files[i].name, this.files.size)) {
-                        label.innerHTML = ''; this.value='';
+                    if(!checkExtension(this.files[i].name, this.files[i].size)) {
+                        label.innerHTML = ''; this.value= '';
                         isExtension = true; break;
                     }
                     formData.append("uploadFiles", files[i])
-
                 }
                 if(isExtension) return;
 
@@ -65,15 +71,22 @@
                 })
                 .catch(err => console.log("Error occurred: " , err))
             }
-            function showUploadedImages(arr) {
-                const uploadResultDiv = document.querySelector(".uploadResult")
+            function showResult(arr) {
+                const uploadResultUl = document.querySelector(".uploadResult ul")
                 let str = ""
                 const url = /*[[@{/display}]]*/'url'
                 for(let i=0;i<arr.length;i++){
-                    str += `<div><img src="${url}?fileName=${arr[i].thumbnailURL}">
-                    <button class="removeBtn" data-name="${arr[i].imageURL}">X</button></div>`
+                    // str += `<div><img src="${url}?fileName=${arr[i].thumbnailURL}">
+                    // <button class="removeBtn" data-name="${arr[i].imageURL}">X</button></div>`
+                    str += `
+                         <li data-name='${arr[i].fileName}' data-path='${arr[i].folderPath}'
+                         data-uuid='${arr[i].uuid}' data-file='${arr[i].imageURL}'>
+                            <div><button class="removeBtn" data-name="${arr[i].imageURL}">X</button>
+                            <img src="${url}?fileName=${arr[i].thumbnailURL}"></div>
+                         </li>
+                    `
                 }
-                uploadResultDiv.innerHTML = str  // 썸내일이미지와 버튼이 DOM트리에 마운트가 됨.
+                uploadResultUl.innerHTML = str  // 썸내일이미지와 버튼이 DOM트리에 마운트가 됨.
                 const removeBtns = document.querySelectorAll(".removeBtn")
                 for(let i=0;i<removeBtns.length;i++){
                     removeBtns[i].onclick = function (e) {
@@ -89,6 +102,28 @@
                         .catch(err => console.log("Error occured: ", err))
                     }
                 }
+            }
+            document.querySelector("#btnSend").onclick = function(e) {
+                e.preventDefault();
+                const title = document.querySelector("#title")
+                if(title.value == "") {title.focus(); return false;}
+                /*if(fileInput.files.length == 0) {
+                  document.querySelector("#custom-label").innerHTML =
+                    "파일을 선택하세요!"
+                  fileInput.focus(); return false;
+                }*/
+                let str = ""
+                const liArr = document.querySelectorAll(".uploadResult ul li")
+                for(let i=0;i<liArr.length;i++) {
+                    str += `
+                        <input type="hidden" name="imageDTOList[${i}].imgName" value="${liArr[i].dataset.name}">
+                        <input type="hidden" name="imageDTOList[${i}].path" value="${liArr[i].dataset.path}">
+                        <input type="hidden" name="imageDTOList[${i}].uuid" value="${liArr[i].dataset.uuid}">
+                    `
+                }
+                console.log(str)
+                document.querySelector(".box").innerHTML = str
+                document.querySelector("form").submit();
             }
         </script>
     </th:block>
