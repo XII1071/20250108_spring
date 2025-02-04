@@ -57,7 +57,7 @@ public class UploadController {
       Path savePath = Paths.get(saveName);
 
       try {
-        uploadFile.transferTo(savePath);
+        uploadFile.transferTo(savePath); /* transferTo: 파일을 만들어주는것  */
         resultDTOList.add(new UploadResultDTO(fileName, uuid, folderPath));
       } catch (IOException e) {
         throw new RuntimeException(e);

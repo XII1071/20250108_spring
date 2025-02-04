@@ -8,9 +8,10 @@
 <h1>UploadEx</h1>
 <input type="file" name="uploadFiles" multiple/>
 <button type="submit" class="uploadBtn">Upload</button>
+<div class="uploadResult"></div>
 </body>
 <script th:inline="javascript">
-    let formData = new FormData();
+    let formData = new FormData(); // Post로 데이터를 전송할 때
     const inputFiles = document.querySelector("input[type='file']")
     document.querySelector(".uploadBtn").onclick = () => {
         let files = inputFiles.files;
@@ -25,6 +26,11 @@
         .then(res => res.json())
         .then(json => {console.log(json)})
         .catch(err => console.log("Error occurred: " , err))
+    }
+    function showUploadedImages(arr){
+        const uploadResultDiv = document.querySelector(".uploadResult")
+        let str = ""
+        const url = /*[[@{/display}]]*/'url'
     }
 </script>
 </html>
