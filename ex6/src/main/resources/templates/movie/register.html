@@ -5,27 +5,92 @@
         <style>
             .form-group{margin-bottom: 30px;}
         </style>
-        <h1 class="mt-4">Board Register Page</h1>
-        <form th:action="@{/board/register}" th:method="post">
+        <h1 class="mt-4">Movie Register Page</h1>
+        <form th:action="@{/movie/register}" th:method="post">
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" class="form-control"
-                placeholder="제목을 입력하세요">
+                       placeholder="영화 제목을 입력하세요">
             </div>
             <div class="form-group">
-                <label for="content">Content</label>
-                <input type="text" name="content" id="content" class="form-control"
-                placeholder="내용을 입력하세요">
+                <label for="fileInput">Select Image Files</label>
+                <input type="file" name="fileInput" id="fileInput" multiple
+                       class="custom-file-input form-control files">
+                <label id="custom-label"></label>
             </div>
-            <div class="form-group">
-                <label for="title">WriterEmail</label>
-                <input type="text" name="writerEmail" id="writerEmail" class="form-control"
-                placeholder="작성자를 입력하세요" value="user@a.a" required>
-            </div>
+            <div class="box"></div><!-- 전송버튼을 누를 때 사용 -->
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
+        <div class="uploadResult"><ul></ul></div><!-- 파일을 추가할 때 사용 -->
+        <script th:inline="javascript">
+            function checkExtension(fileName, fileSize){
+                maxSize = 1024*1024*10;
+                if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
+                // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
+                //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
+                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
+                if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
+                return true
+            }
+            document.querySelector("#fileInput").onchange = function() {
+                let formData = new FormData();
+                const fileName = this.value.split("\\").pop();
+                let label = document.querySelector("#custom-label")
+                label.innerHTML = (this.files.length - 1) == 0 ?'':
+                    `${fileName} 외 ${fileInput.files.length -1}개`
+
+                let files = this.files;
+                let isExtension = false;
+                for(let i=0;i<files.length;i++) {
+                    //console.log(files[i])
+                    if(!checkExtension(this.files[i].name, this.files.size)) {
+                        label.innerHTML = ''; this.value='';
+                        isExtension = true; break;
+                    }
+                    formData.append("uploadFiles", files[i])
+
+                }
+                if(isExtension) return;
+
+                const url = /*[[@{/uploadAjax}]]*/'url'
+                fetch(url, {
+                    method: 'POST', body: formData, dataType: 'json',
+                })
+                .then(res => res.json())
+                .then(json => {
+                    console.log(json)
+                    showResult(json)
+                })
+                .catch(err => console.log("Error occurred: " , err))
+            }
+            function showUploadedImages(arr) {
+                const uploadResultDiv = document.querySelector(".uploadResult")
+                let str = ""
+                const url = /*[[@{/display}]]*/'url'
+                for(let i=0;i<arr.length;i++){
+                    str += `<div><img src="${url}?fileName=${arr[i].thumbnailURL}">
+                    <button class="removeBtn" data-name="${arr[i].imageURL}">X</button></div>`
+                }
+                uploadResultDiv.innerHTML = str  // 썸내일이미지와 버튼이 DOM트리에 마운트가 됨.
+                const removeBtns = document.querySelectorAll(".removeBtn")
+                for(let i=0;i<removeBtns.length;i++){
+                    removeBtns[i].onclick = function (e) {
+                        const fileName = this.dataset.name
+                        const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                        fetch(removeUrl + fileName,{
+                            method:'POST', dataType:'json', fileName:fileName
+                        })
+                        .then(res => res.json())
+                        .then(json => {
+                            if(json) this.closest('div').remove()
+                        })
+                        .catch(err => console.log("Error occured: ", err))
+                    }
+                }
+            }
+        </script>
     </th:block>
 </th:block>
 

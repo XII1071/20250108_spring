@@ -13,3 +13,4 @@ public class Ex6Application {
 		System.out.println("http://localhost:8080/ex6");
 	}
 }
+
