@@ -11,7 +11,7 @@
 <div class="uploadResult"></div>
 </body>
 <script th:inline="javascript">
-    let formData = new FormData(); // Post로 데이터를 전송할 때
+    let formData = new FormData();
     const inputFiles = document.querySelector("input[type='file']")
     document.querySelector(".uploadBtn").onclick = () => {
         let files = inputFiles.files;
@@ -24,13 +24,36 @@
             method: 'POST', body: formData, dataType: 'json',
         })
         .then(res => res.json())
-        .then(json => {console.log(json)})
+        .then(json => {
+            console.log(json)
+            showUploadedImages(json)
+        })
         .catch(err => console.log("Error occurred: " , err))
     }
-    function showUploadedImages(arr){
+    function showUploadedImages(arr) {
         const uploadResultDiv = document.querySelector(".uploadResult")
         let str = ""
         const url = /*[[@{/display}]]*/'url'
+        for(let i=0;i<arr.length;i++){
+            str += `<div><img src="${url}?fileName=${arr[i].thumbnailURL}">
+            <button class="removeBtn" data-name="${arr[i].imageURL}">X</button></div>`
+        }
+        uploadResultDiv.innerHTML = str  // 썸내일이미지와 버튼이 DOM트리에 마운트가 됨.
+        const removeBtns = document.querySelectorAll(".removeBtn")
+        for(let i=0;i<removeBtns.length;i++){
+            removeBtns[i].onclick = function (e) {
+                const fileName = this.dataset.name
+                const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                fetch(removeUrl + fileName,{
+                    method:'POST', dataType:'json', fileName:fileName
+                })
+                .then(res => res.json())
+                .then(json => {
+                    if(json) this.closest('div').remove()
+                })
+                .catch(err => console.log("Error occured: ", err))
+            }
+        }
     }
 </script>
 </html>

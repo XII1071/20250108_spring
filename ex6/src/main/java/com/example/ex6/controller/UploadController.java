@@ -2,6 +2,7 @@ package com.example.ex6.controller;
 
 import com.example.ex6.dto.UploadResultDTO;
 import lombok.extern.log4j.Log4j2;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,10 +57,17 @@ public class UploadController {
       String uuid = UUID.randomUUID().toString();
       String saveName = uploadPath + File.separator + folderPath
           + File.separator + uuid + "_" + fileName;
-      Path savePath = Paths.get(saveName);
+      Path savePath = Paths.get(saveName);// file명을 제외한 경로만 저장
 
       try {
         uploadFile.transferTo(savePath); /* transferTo: 파일을 만들어주는것  */
+        
+        //thumbnail 생성
+        String thumbnailSaveName = uploadPath + File.separator + folderPath
+            + File.separator+ "s_" + uuid + "_" + fileName;
+        File thumbnailFile = new File(thumbnailSaveName);
+        Thumbnailator.createThumbnail(savePath.toFile(), thumbnailFile, 100, 100);
+
         resultDTOList.add(new UploadResultDTO(fileName, uuid, folderPath));
       } catch (IOException e) {
         throw new RuntimeException(e);
@@ -72,11 +82,11 @@ public class UploadController {
     try {
       String searchFilename = URLDecoder.decode(fileName, "UTF-8");
       File file = new File(uploadPath + File.separator + searchFilename);
-      if (size != null && size.equals("1")) {
-        log.info(">>", file.getName());
-        // 미리보기 할 때 링크에 size=1로 설정하여 섬네일명에서 s_ 를 제거하고 가져옴
-        file = new File(file.getParent(), file.getName().substring(2));
-      }
+//      if (size != null && size.equals("1")) {
+//        log.info(">>", file.getName());
+//        // 미리보기 할 때 링크에 size=1로 설정하여 섬네일명에서 s_ 를 제거하고 가져옴
+//        file = new File(file.getParent(), file.getName().substring(2));
+//      }
       log.info("file: " + file);
       HttpHeaders headers = new HttpHeaders();
       // 파일의 확장자에 따라서 브라우저에 전송하는 MIME타입을 결정
@@ -84,6 +94,28 @@ public class UploadController {
       result = new ResponseEntity<>(
           FileCopyUtils.copyToByteArray(file), headers, HttpStatus.OK);
     } catch (Exception e) {
+      log.error(e.getMessage());
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return result;
+  }
+
+  @PostMapping("/removeFile")
+  public ResponseEntity<Boolean> removeFile(String fileName) {
+    log.info("<<", fileName);
+    ResponseEntity<Boolean> result = null;
+    String srchFileName = null;
+
+    try {
+      srchFileName = URLDecoder.decode(fileName, "UTF-8");
+      File file = new File(uploadPath + File.separator + srchFileName);
+      boolean tmpRemove1 = file.delete();
+      File thumbnail = new File(file.getParent(), "s_" + file.getName());
+      boolean tmpRemove2 = thumbnail.delete();
+      boolean lastRemove = tmpRemove1 && tmpRemove2;
+      result = new ResponseEntity<>(lastRemove,
+          lastRemove ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
