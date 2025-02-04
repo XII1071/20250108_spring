@@ -61,7 +61,7 @@ public class UploadController {
 
       try {
         uploadFile.transferTo(savePath); /* transferTo: 파일을 만들어주는것  */
-        
+
         //thumbnail 생성
         String thumbnailSaveName = uploadPath + File.separator + folderPath
             + File.separator+ "s_" + uuid + "_" + fileName;
