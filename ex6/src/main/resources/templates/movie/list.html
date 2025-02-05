@@ -11,10 +11,10 @@
                     <select class="form-control" id="type" name="type">
                         <option th:selected="${pageRequestDTO.type == null}">전체 보기</option>
                         <option value="t" th:selected="${pageRequestDTO.type == 't'}">제목</option>
-                        <option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
+                        <!-- option value="c" th:selected="${pageRequestDTO.type == 'c'}">내용</option>
                         <option value="w" th:selected="${pageRequestDTO.type == 'w'}">작성자</option>
                         <option value="tc" th:selected="${pageRequestDTO.type == 'tc'}">제목+내용</option>
-                        <option value="tcw" th:selected="${pageRequestDTO.type == 'tcw'}">제목+내용+작성자</option>
+                        <option value="tcw" th:selected="${pageRequestDTO.type == 'tcw'}">제목+내용+작성자</option -->
                     </select>
                 </div>
                 <input type="text" class="form-control" name="keyword" id="keyword"
@@ -113,7 +113,7 @@
                 }
                 // 등록 후 알림창 띄우는 파트 start
                 var msg = [[${msg}]]
-                if(msg === '' || history.state) return // 모달창 안띄우는 코드
+                if(msg === '' || history.state) return //모달창 안띄우는 코드
                 if(msg) {
                     const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
                     {backdrop: true});

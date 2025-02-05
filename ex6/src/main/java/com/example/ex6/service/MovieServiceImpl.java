@@ -9,14 +9,17 @@ import com.example.ex6.repository.MovieImageRepository;
 import com.example.ex6.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Service
@@ -30,7 +33,11 @@ public class MovieServiceImpl implements MovieService {
   public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("mno").descending());
     // Page<Movie> result = movieRepository.findAll(pageable);
-    Page<Object[]> result = movieRepository.getListPageImg(pageable);
+    // Page<Object[]> result = movieRepository.getListPageImg(pageable);
+    Page<Object[]> result = movieRepository.searchPage(pageRequestDTO.getType(),
+        pageRequestDTO.getKeyword(),
+        pageable);
+
     Function<Object[], MovieDTO> fn = objects -> entityToDTO(
         (Movie) objects[0],
         (List<MovieImage>) (Arrays.asList((MovieImage) objects[1])),
@@ -51,5 +58,26 @@ public class MovieServiceImpl implements MovieService {
     });
     return movie.getMno();
   }
+
+  @Override
+  public MovieDTO get(Long mno) {
+    List<Object[]> result = movieRepository.getMovieWithAll(mno);
+    Movie movie = (Movie) result.get(0)[0];
+    List<MovieImage> movieImages = new ArrayList<>();
+    result.forEach(new Consumer<Object[]>() {
+      @Override
+      public void accept(Object[] objects) {
+        movieImages.add((MovieImage) objects[1]);
+      }
+    });
+    Double avg = (Double) result.get(0)[2];
+    Long reviewCnt = (Long) result.get(0)[3];
+
+    return entityToDTO(movie, movieImages, avg, reviewCnt);
+  }
+
+  @Value("${com.example.upload.path}")
+  private String uploadPath;
+
 
 }

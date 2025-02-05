@@ -4,53 +4,65 @@
     <th:block th:fragment="content">
         <style>
             .form-group{margin-bottom: 20px;}
+            .uploadResult {width: 100%;background:gray;margin-top:10px;}
+            .uploadResult ul {
+                display: flex; flex-flow:row; justify-content:center;
+                align-items;center;vertical-align:top;overflow: auto;
+            }
+            .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
+            .uploadResult ul li img {width: 100px;}
         </style>
-        <h1 class="mt-4">Board Read Page</h1>
-        <form th:action="@{/board/register}" th:method="post">
+        <h1 class="mt-4">Movie Read Page</h1>
+        <form th:action="@{/movie/register}" th:method="post">
             <div class="form-group">
-                <label for="title">Bno</label>
-                <input type="text" name="bno" id="bno" class="form-control" readonly
-                       th:value="${boardDTO.bno}">
+                <label for="mno">Mno</label>
+                <input type="text" name="mno" id="mno" class="form-control" readonly
+                       th:value="${movieDTO.mno}">
             </div>
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" class="form-control"
-                       th:value="${boardDTO.title}" readonly>
+                       th:value="${movieDTO.title}" readonly>
             </div>
             <div class="form-group">
-                <label for="content">Content</label>
-                <input type="text" name="content" id="content" class="form-control"
-                       th:value="${boardDTO.content}" readonly>
+                <label for="avg">Average</label>
+                <input type="text" name="avg" id="avg" class="form-control"
+                       th:value="${movieDTO.avg}" readonly>
             </div>
             <div class="form-group">
-                <label for="title">WriterName</label>
-                <input type="text" name="writerName" id="writerName" class="form-control"
-                       th:value="${boardDTO.writerName}" readonly>
-            </div>
-            <div class="form-group">
-                <label for="title">Writer</label>
-                <input type="text" name="writerEmail" id="writerEmail" class="form-control"
-                       th:value="${boardDTO.writerEmail}" readonly>
+                <label for="reviewCnt">Review Count</label>
+                <input type="text" name="reviewCnt" id="reviewCnt" class="form-control"
+                       th:value="${movieDTO.reviewCnt}" readonly>
             </div>
             <div class="form-group">
                 <label for="regDate">RegDate</label>
                 <input type="text" name="regDate" id="regDate" class="form-control" readonly
-                       th:value="${#temporals.format(boardDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
                 <input type="text" name="modDate" id="modDate" class="form-control"readonly
-                       th:value="${#temporals.format(boardDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
-                <a class="btn btn-primary" th:href="@{/board/modify(page=${pageRequestDTO.page},bno=${boardDTO.bno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Modify</a>
-                <a class="btn btn-info" th:href="@{/board/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >List</a>
+                <a class="btn btn-primary" th:href="@{/movie/modify(page=${pageRequestDTO.page},mno=${movieDTO.mno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Modify</a>
+                <a class="btn btn-info" th:href="@{/movie/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >List</a>
+            </div>
+            <div class="uploadResult">
+                <ul>
+                    <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
+                        th:data-file="${movieImageDTO.getThumbnailURL}" style="cursor:pointer;">
+                        <img
+                                th:if="${movieImageDTO.path != null}"
+                                th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
+                    </li>
+                </ul>
             </div>
         </form>
         <div class="mt-4">
             <span class="btn btn-outline-secondary" onclick="addReply()">Add Reply</span>
-            <span style="font-size:9pt">댓글:
-            <span id="repCnt" th:text="${boardDTO.replyCount}"></span> 개
+            <span style="font-size:9pt">리뷰:
+            <span id="repCnt" th:text="${movieDTO.reviewCnt}"></span> 개
             </span>
         </div>
         <div class="list-group replyList" style="margin: 20px 0;"></div>
@@ -71,7 +83,7 @@
             </div>
         </div>
         <script th:inline="javascript">
-            const bno = [[${boardDTO.bno}]]
+            const mno = [[${movieDTO.mno}]]
 
             window.onload = () => {
                 // 수정후 변경사항을 위한 모달
@@ -89,9 +101,9 @@
             }
             function loadReplyJSON(){
                 const replyListGroup = document.querySelector(".replyList")
-                const url = /*[[@{/replies/board/}]]*/'url'
+                const url = /*[[@{/replies/movie/}]]*/'url'
 
-                fetch(url+bno, {method: 'GET',})
+                fetch(url+mno, {method: 'GET',})
                 .then(response => response.json())
                 .then(data => {
                     //console.log(data)
@@ -161,7 +173,7 @@
                     replyer.focus();
                     return;
                 }
-                let reply = {bno: bno, text: text.value, replyer: replyer.value}
+                let reply = {mno: mno, text: text.value, replyer: replyer.value}
                 //alert(JSON.stringify(reply))
                 const url = /*[[@{/replies}]]*/'url'
                 fetch(url, {

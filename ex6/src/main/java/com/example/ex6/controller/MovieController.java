@@ -1,3 +1,4 @@
+
 package com.example.ex6.controller;
 
 import com.example.ex6.dto.MovieDTO;
@@ -35,8 +36,8 @@ public class MovieController {
     return "redirect:/movie/list";
   }
 
+  @GetMapping({"/read", "/modify"})
+  public void get(Long mno, PageRequestDTO pageRequestDTO, Model model) {
+    model.addAttribute("movieDTO", movieService.get(mno));
+  }
 }
-
-
-
-

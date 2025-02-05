@@ -19,6 +19,8 @@ public interface MovieService {
 
   Long register(MovieDTO movieDTO);
 
+  MovieDTO get(Long mno);
+
   default Map<String, Object> dtoToEntity(MovieDTO movieDTO) {
     System.out.println(movieDTO);
     Map<String, Object> entityMap = new HashMap<>();
