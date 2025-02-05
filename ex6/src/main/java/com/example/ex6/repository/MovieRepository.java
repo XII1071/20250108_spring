@@ -11,7 +11,7 @@ import java.util.List;
 /* 접근 2가지. 쿼리 메서드 접근, 쿼리 어노테이션 */
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-  // 영화에 대한 리뷰의 평점과 댓글 개수를 출력
+  // 영화에 대한 리뷰의 평점과 리뷰 개수를 출력
   @Query("select m, avg(coalesce(r.grade,0)), count(distinct r) " +
       "from Movie m left outer join Review r " +
       "on r.movie = m group by m ")
@@ -26,14 +26,14 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 * 리뷰가 없어도 평점이 0으로 계산되며, 대표 이미지는 가장 큰 inum만 선택되도록 처리했습니다.
 */
 
-  // 영화와 영화이미지,리뷰의 평점과 댓글 개수 출력
+  // 영화와 영화이미지,리뷰의 평점과 리뷰 개수 출력
   @Query("select m, mi, avg(coalesce(r.grade,0)), count(distinct r) " +
           "from Movie m " +
           "left outer join MovieImage mi on mi.movie = m " +
           "left outer join Review      r on r.movie  = m group by m ")
   Page<Object[]> getListPageImg(Pageable pageable);
 
-  // 영화와 영화이미지,리뷰의 평점과 댓글 개수 출력
+  // 영화와 영화이미지,리뷰의 평점과 리뷰 개수 출력
   // spring 3.x 버전 이상은 실행 안됨
   @Query("select m, max(mi), avg(coalesce(r.grade,0)), count(distinct r) " +
           "from Movie m " +

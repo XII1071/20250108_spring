@@ -21,8 +21,8 @@ public class MovieController {
 
   @GetMapping({"", "/", "/list"})
   public String list(PageRequestDTO pageRequestDTO, Model model) {
-//    model.addAttribute("result", movieService.getList(pageRequestDTO));
-    return "/board/list";
+    model.addAttribute("result", movieService.getList(pageRequestDTO));
+    return "/movie/list";
   }
 
   @GetMapping("/register")

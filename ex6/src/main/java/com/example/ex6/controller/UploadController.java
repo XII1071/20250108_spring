@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,7 +59,7 @@ public class UploadController {
       Path savePath = Paths.get(saveName);// file명을 제외한 경로만 저장
 
       try {
-        uploadFile.transferTo(savePath); /* transferTo: 파일을 만들어주는것  */
+        uploadFile.transferTo(savePath);
 
         //thumbnail 생성
         String thumbnailSaveName = uploadPath + File.separator + folderPath
@@ -82,11 +81,11 @@ public class UploadController {
     try {
       String searchFilename = URLDecoder.decode(fileName, "UTF-8");
       File file = new File(uploadPath + File.separator + searchFilename);
-//      if (size != null && size.equals("1")) {
-//        log.info(">>", file.getName());
-//        // 미리보기 할 때 링크에 size=1로 설정하여 섬네일명에서 s_ 를 제거하고 가져옴
-//        file = new File(file.getParent(), file.getName().substring(2));
-//      }
+      if (size != null && size.equals("1")) {
+        log.info(">>", file.getName());
+        // 미리보기 할 때 링크에 size=1로 설정하여 섬네일명에서 s_ 를 제거하고 가져옴
+        file = new File(file.getParent(), file.getName().substring(2));
+      }
       log.info("file: " + file);
       HttpHeaders headers = new HttpHeaders();
       // 파일의 확장자에 따라서 브라우저에 전송하는 MIME타입을 결정

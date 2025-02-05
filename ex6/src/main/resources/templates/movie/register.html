@@ -46,7 +46,7 @@
                 const fileName = this.value.split("\\").pop();
                 let label = document.querySelector("#custom-label")
                 label.innerHTML = (this.files.length - 1) == 0 ?'':
-                    `${fileName} 외 ${fileInput.files.length -1}개`
+                    `${fileName} 외 ${fileInput.files.length - 1}개`
 
                 let files = this.files;
                 let isExtension = false;
@@ -97,7 +97,7 @@
                         })
                         .then(res => res.json())
                         .then(json => {
-                            if(json) this.closest('div').remove()
+                            if(json) this.closest('li').remove()
                         })
                         .catch(err => console.log("Error occured: ", err))
                     }

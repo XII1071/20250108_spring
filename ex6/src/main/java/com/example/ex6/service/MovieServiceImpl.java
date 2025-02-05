@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -25,13 +26,19 @@ public class MovieServiceImpl implements MovieService {
   private final MovieRepository movieRepository;
   private final MovieImageRepository movieImageRepository;
 
-//  @Override
-//  public PageRequestDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
-//    Pageable pageable = pageRequestDTO.getPageable(Sort.by("mno").descending());
-//    Page<Object[]> result = null;
-//    Function<Object[], MovieDTO> fn = null;
-//    return new PageResultDTO<>(result, fn);
-//  }
+  @Override
+  public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
+    Pageable pageable = pageRequestDTO.getPageable(Sort.by("mno").descending());
+    // Page<Movie> result = movieRepository.findAll(pageable);
+    Page<Object[]> result = movieRepository.getListPageImg(pageable);
+    Function<Object[], MovieDTO> fn = objects -> entityToDTO(
+        (Movie) objects[0],
+        (List<MovieImage>) (Arrays.asList((MovieImage) objects[1])),
+        (Double) objects[2],
+        (Long) objects[3]
+    );
+    return new PageResultDTO<>(result, fn);
+  }
 
   @Override
   public Long register(MovieDTO movieDTO) {
