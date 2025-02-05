@@ -92,15 +92,19 @@ public class MovieServiceImpl implements MovieService {
   public MovieDTO get(Long mno) {
 
     /* 데이터베이스에서 특정 영화의 정보를 가져옴 */
+    // (a) getMovieWithAll(mno)는 [Movie, MovieImage, 평균평점, 리뷰개수]를 여러 줄로 반환한다고 가정
     List<Object[]> result = movieRepository.getMovieWithAll(mno);
 
     /* 첫 번째 결과에서 Movie 엔티티 가져오기 */
+    // (b) 첫 번째 row(0번 인덱스)의 첫 번째 컬럼이 Movie 엔티티
     Movie movie = (Movie) result.get(0)[0];
 
     /* 영화 이미지를 저장할 리스트 생성 */
+    // (c) 여러 개의 이미지 정보를 담을 리스트
     List<MovieImage> movieImages = new ArrayList<>();
 
     /* 결과 리스트를 돌면서 이미지 정보 추가 */
+    // (d) result에 담긴 각 row에서 MovieImage만 추출해서 리스트에 추가
     result.forEach(new Consumer<Object[]>() {
 
       @Override
@@ -112,13 +116,16 @@ public class MovieServiceImpl implements MovieService {
     Double avg = (Double) result.get(0)[2];
 
     /* 리뷰 개수 가져오기 */
+    // (e) 평균 평점 & 리뷰 개수(0번 row의 2번째, 3번째 요소 가정)
     Long reviewCnt = (Long) result.get(0)[3];
 
     /* 데이터를 MovieDTO 객체로 변환하여 반환 */
+    // (f) 엔티티 + 이미지 + 평점 + 리뷰개수를 DTO로 변환하여 반환
     return entityToDTO(movie, movieImages, avg, reviewCnt);
   }
 
   /* 업로드할 파일이 저장될 경로를 application.properties에서 가져옴 */
+  // 7) 업로드 경로 (application.properties 등에서 com.example.upload.path 로 설정)
   @Value("${com.example.upload.path}")
   private String uploadPath;
 
