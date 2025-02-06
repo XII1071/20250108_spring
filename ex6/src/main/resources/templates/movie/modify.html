@@ -19,7 +19,7 @@
               overflow: hidden;pointer-events: none; -webkit-text-stroke:2px black;}
         </style>
         <h1 class="mt-4">Movie Modify Page</h1>
-        <form th:action="@{/movie/register}" th:method="post">
+        <form th:action="@{/movie/modify}" th:method="post" id="frmSend">
             <div class="form-group">
                 <label for="mno">Mno</label>
                 <input type="text" name="mno" id="mno" class="form-control" readonly
@@ -28,7 +28,7 @@
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" class="form-control"
-                       th:value="${movieDTO.title}" readonly>
+                       th:value="${movieDTO.title}">
             </div>
             <div class="form-group">
                 <label for="avg">Average</label>
@@ -42,13 +42,19 @@
             </div>
             <div class="form-group">
                 <label for="regDate">RegDate</label>
-                <input type="text" name="regDate" id="regDate" class="form-control" readonly
+                <input type="text" id="regDate" class="form-control" readonly
                        th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
-                <input type="text" name="modDate" id="modDate" class="form-control"readonly
+                <input type="text" id="modDate" class="form-control"readonly
                        th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+            </div>
+            <div class="form-group">
+                <label for="fileInput">Select Image Files</label>
+                <input type="file" id="fileInput" class="custom-file-input form-control files"
+                       multiple></input>
+                <label id="custom-label"></label>
             </div>
             <div class="box"></div>
             <div class="form-group">
@@ -56,24 +62,26 @@
                 <button class="btn btn-danger btnDele">Delete</button>
                 <button class="btn btn-info btnBack">Back</button>
             </div>
-            <div class="uploadResult">
-                <ul>
-                    <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
-                        th:data-file="${movieImageDTO.getThumbnailURL}" style="cursor:pointer;">
+        </form>
+        <div class="uploadResult">
+            <ul>
+                <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
+                    th:data-path='${movieImageDTO.path}'
+                    th:data-uuid='${movieImageDTO.uuid}'
+                    th:data-file='${movieImageDTO.getImageURL}'
+                    th:data-name='${movieImageDTO.imgName}'
+                    style="cursor:pointer;">
+                    <div>
+                        <button type="button"
+                                th:onclick="deleteFileDb(this)">X
+                        </button>
                         <img
                                 th:if="${movieImageDTO.path != null}"
                                 th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
-                    </li>
-                </ul>
-            </div>
-        </form>
-        <div class="mt-4">
-            <span class="btn btn-outline-secondary" onclick="addReview()">Add Review</span>
-            <span style="font-size:9pt">리뷰:
-            <span id="revCnt" th:text="${movieDTO.reviewCnt}"></span> 개
-            </span>
+                    </div>
+                </li>
+            </ul>
         </div>
-        <div class="list-group reviewList" style="margin: 20px 0;"></div>
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -93,195 +101,95 @@
         <script th:inline="javascript">
             const mno = [[${movieDTO.mno}]]
 
-            window.onload = () => {
-                // 수정후 변경사항을 위한 모달
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
-                    {backdrop: true});
-                var msg = [[${msg}]]
-                if(msg) {
-                    document.querySelector(".modal-body").innerHTML=`<p>${msg}되었습니다.</p>`
-                    document.querySelector("#exampleModalLabel")
-                        .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
-                    myModal.show()
-                    history.replaceState({}, null, null)
-                }
-                loadReviewJSON() // 댓글을 REST하게 불러오는 함수
+            function checkExtension(fileName, fileSize){
+                maxSize = 1024*1024*10;
+                if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
+                // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
+                //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
+                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
+                if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
+                return true
             }
-            function loadReviewJSON(){
-                const reviewListGroup = document.querySelector(".reviewList")
-                const url = /*[[@{/reviews/}]]*/'url'
+            document.querySelector("#fileInput").onchange = function() {
+                let formData = new FormData();
+                const fileName = this.value.split("\\").pop();
+                let label = document.querySelector("#custom-label")
+                label.innerHTML = (this.files.length - 1) == 0 ?'':
+                    `${fileName} 외 ${fileInput.files.length - 1}개`
 
-                fetch(url+mno, {method: 'GET',})
+                let files = this.files;
+                let isExtension = false;
+                for(let i=0;i<files.length;i++) {
+                    //console.log(files[i])
+                    if(!checkExtension(this.files[i].name, this.files[i].size)) {
+                        label.innerHTML = ''; this.value= '';
+                        isExtension = true; break;
+                    }
+                    formData.append("uploadFiles", files[i])
+                }
+                if(isExtension) return;
+
+                const url = /*[[@{/uploadAjax}]]*/'url'
+                fetch(url, {
+                    method: 'POST', body: formData, dataType: 'json',
+                })
+                .then(res => res.json())
+                .then(json => {
+                    console.log(json)
+                    showResult(json)
+                })
+                .catch(err => console.log("Error occurred: " , err))
+            }
+            function showResult(arr) {
+                const uploadUL = document.querySelector(".uploadResult ul");
+                let str = ""
+                const url = /*[[@{/display}]]*/'url'
+                for(let i=0;i<arr.length;i++){
+                  str += `<li data-name='${arr[i].fileName}' data-path='${arr[i].folderPath}'
+                  data-uuid='${arr[i].uuid}' data-file='${arr[i].imageURL}'><div>
+                  <button class="removeBtn" type="button">X</button>
+                  <img src="${url}?fileName=${arr[i].thumbnailURL}">
+                  </div></li>`
+                }
+                uploadUL.innerHTML += str;
+                const removeBtns = document.querySelectorAll(".removeBtn");
+                for(let i=0;i<removeBtns.length;i++){
+                  removeBtns[i].onclick = function() {
+                    const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                    const targetLi = this.closest('li')
+                    const fileName = targetLi.dataset.file;
+                    fetch(removeUrl+fileName, {
+                      method: 'POST', dataType: 'json', fileName: fileName
+                    })
+                    .then(response => response.json())
+                    .then(json => {
+                      console.log(json)
+                      if(json === true) targetLi.remove()
+                      document.querySelector("#custom-label").innerHTML = ''
+                      document.querySelector("#fileInput").value = '';
+                    })
+                    .catch(err => console.log("Error occurred: ", err))
+                  }
+                }
+            }
+
+            function deleteFileDb(btn) {
+                const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                const targetLi = btn.closest('li')
+                const fileName = targetLi.dataset.file;
+                const uuid = targetLi.dataset.uuid;
+                /*
+                fetch(removeUrl+fileName+"&uuid="+uuid, {
+                  method: 'POST', dataType: 'json', fileName: fileName
+                })
                 .then(response => response.json())
-                .then(data => {
-                    //console.log(data)
-                    let str = "";
-                    for(let i=0;i<data.length;i++){
-                        str += `
-                            <div class="card-body form-control mb-1"
-                            onmouseover="this.style.background='#d6e6ff'"
-                            onmouseout="this.style.background='white'"
-                            data-reviewnum="${data[i].reviewnum}" data-text="${data[i].text}"
-                            data-nickname="${data[i].nickname}" data-grade="${data[i].grade}"
-                            data-mid="${data[i].mid}" data-email="${data[i].email}"
-                            style="padding:5px 20px;cursor:pointer;"
-                            onclick="revRead('${data[i].reviewnum}','${data[i].text}','${data[i].mid}','${data[i].grade}','${data[i].nickname}')"
-                            >
-                                <div style="display:inline-block;width:49%">
-                                    <h6 style="display:inline-block;width:70px">${data[i].reviewnum}</h6>
-                                    <h5 class="card-text" style="display:inline-block;">${data[i].text}
-                                    <span class="starRating" data-grade="${data[i].grade}"></span></h5>
-                                </div>
-                                <div style="display:inline-block;width:48%;text-align:right;right-padding:20px;">
-                                    <span class="card-subtitle text-muted">${data[i].nickname}</span>
-                                    <span class="card-subtitle text-muted"
-                                    style="display:inline-block;width:150px;color:rgb(148, 163, 184);"
-                                    >${formatDateTime(data[i].regDate)}</span>
-                                </div>
-                            </div>
-                        `
-                    }
-                    reviewListGroup.innerHTML = str
-
-                    const starRatings = document.querySelectorAll(".starRating")
-                    for(let i=0;i<starRatings.length;i++){
-                        let starStr = ''
-                        for(let j=0;j<starRatings[i].dataset.grade;j++){
-                            starStr += "⭐"
-                        }
-                        starRatings[i].innerHTML = starStr;
-                    }
+                .then(json => {
+                  console.log(json)
+                  if(json === true) targetLi.remove()
                 })
-            }
-            function formatDateTime(str) {
-              const date = new Date(str)
-              return `${date.getFullYear()}/${len2(date.getMonth()+1)}`
-                 + `/${len2(date.getDate())} ${len2(date.getHours())}:`
-                 + `${len2(date.getMinutes())}`
-            }
-            function len2(num) {
-              return (num<10) ? "0"+num : num;
-            }
-            function addReview(){
-                // 댓글 추가하기 위한 창 띄우기 함수
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                document.querySelector("#exampleModalLabel").textContent = "리뷰 추가 창"
-                document.querySelector(".modal-body").innerHTML = `
-                    <input type="text" class="form-control" name="mid" placeholder="Member ID(mid)" value="10">
-                    <label id="notice">Grade</label> <span class="star">★★★★★<span>★★★★★</span>
-                        <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
-                        </span><br>
-                    <input type="text" class="form-control" name="text" placeholder="Review Text...">
-                `
-                document.querySelector(".modal-footer").innerHTML = `
-                    <button type="button" class="btn btn-primary save" data-bs-dismiss="modal" onclick="revSave()">등록</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                `
-                myModal.show() // 댓글 입력을 위한 모달
-            }
-            function revSave() {
-                // 리뷰 등록 버튼
-                // 모달이 떠 있는 상태에서 등록 버튼누른 후 또 모달이 떠야 하기 때문에 모달을 초기화함.
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                let mid = document.querySelector(".modal-body input[name='mid']")
-                let text = document.querySelector(".modal-body input[name='text']")
-                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
-
-                let notice = document.querySelector('#notice')
-
-                if(!mid.value) {modalNotice("입력","회원번호를 확인하여 주세요");return false;}
-                if(!text.value) {modalNotice("입력","리뷰 텍스트를 확인하여 주세요");return false;}
-                if(!grade) {modalNotice("입력","리뷰 별점을 확인하여 주세요");return false;}
-
-                let review = {mno: mno, text: text.value, mid: mid.value, grade: grade}
-
-                const url = /*[[@{/reviews}]]*/'url'
-                fetch(url, {
-                    method: 'POST', headers:{'Content-type': 'application/json'},
-                    body: JSON.stringify(review)
-                })
-                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
-                .then(function(data){
-                    let cnt = document.querySelector("#revCnt")
-                    cnt.textContent = parseInt(cnt.textContent) + 1;
-                    loadReviewJSON()
-                    modalNotice(`등록`, `${data}`)
-                })
-            }
-
-            // 리뷰 상세 보기
-            function revRead(reviewnum, text, mid, grade, nickname) {
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                document.querySelector("#exampleModalLabel").textContent = reviewnum +"번 리뷰 보기"
-                document.querySelector(".modal-body").innerHTML = `
-                    <input type="hidden" class="form-control" name="reviewnum" value="${reviewnum}" readonly>
-                    <input type="hidden" class="form-control" name="mid" value="${mid}">
-                    <label id="notice">Grade</label><span class="star">★★★★★<span>★★★★★</span>
-                    <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
-                    </span><br>
-                    <input type="text" class="form-control" name="text" value="${text}">
-                `
-                document.querySelector(".modal-footer").innerHTML = `
-                    <button type="button" class="btn btn-warning modify" data-bs-dismiss="modal" onclick="revModify('${reviewnum}')">수정</button>
-                    <button type="button" class="btn btn-danger remove" data-bs-dismiss="modal" onclick="revRemove('${reviewnum}')">삭제</button>
-                    <span class="btn btn-secondary" data-bs-dismiss="modal">닫기</span>
-                `
-                document.querySelector('.star span').style.width = `${grade * 20}%`
-
-                myModal.show() // 댓글 입력을 위한 모달
-            }
-            function revModify(reviewnum) {
-                let text = document.querySelector(".modal-body input[name='text']")
-                let mid = document.querySelector(".modal-body input[name='mid']")
-                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
-
-                if(!text.value) {modalNotice("수정","리뷰 텍스트를 확인하여 주세요");return false;}
-                if(!grade) {modalNotice("수정","리뷰 별점을 확인하여 주세요");return false;}
-                let review = {mno: mno, text: text.value, mid: mid.value
-                              , grade: grade, reviewnum: reviewnum}
-
-                const url = /*[[@{/reviews}]]*/'url'
-                fetch(url, {
-                    method: 'PUT', headers:{'Content-type': 'application/json'},
-                    body: JSON.stringify(review)
-                })
-                .then(res => res.text())
-                .then(function(data){
-                    modalNotice(`수정`, `${data}`)
-                    loadReviewJSON()
-                })
-            }
-            function revRemove(reviewnum) {
-                const url = /*[[@{/reviews/}]]*/'url'
-                fetch(url+reviewnum, {
-                    method: 'DELETE', headers:{'Content-type': 'application/json'},
-                })
-                .then(res => res.text())
-                .then(function(data){
-                    let cnt = document.querySelector("#revCnt")
-                    cnt.textContent = parseInt(cnt.textContent) - 1;
-                    loadReviewJSON()
-                    modalNotice(`삭제`, `${data}`)
-                })
-            }
-            function drawStar(target){
-                document.querySelector('.star span').style.width = `${target.value * 10}%`
-            }
-            function modalNotice(title, msg) {
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                document.querySelector(".modal-body").innerHTML = `${msg}`
-                if(title == "수정" || title == "삭제") {
-                    document.querySelector("#exampleModalLabel").textContent = `리뷰 ${title}`
-                    document.querySelector(".modal-footer .modify").style.display = 'none'
-                    document.querySelector(".modal-footer .remove").style.display = 'none'
-                } else if(title == "등록") {
-                    document.querySelector("#exampleModalLabel").textContent = `${title} 완료`
-                    document.querySelector(".modal-footer .save").style.display = 'none'
-                } else if(title == "입력") {
-                    document.querySelector("#exampleModalLabel").textContent = `${title} 오류`
-                    document.querySelector(".modal-footer .save").style.display = 'none'
-                }
-                myModal.show()
+                .catch(err => console.log("Error occurred: ", err))
+                */
+                targetLi.remove()
             }
 
         </script>
