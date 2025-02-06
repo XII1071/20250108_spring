@@ -4,67 +4,286 @@
     <th:block th:fragment="content">
         <style>
             .form-group{margin-bottom: 20px;}
+            .uploadResult {width: 100%;background:gray;margin-top:10px;}
+            .uploadResult ul {
+                display: flex; flex-flow:row; justify-content:center;
+                align-items;center;vertical-align:top;overflow: auto;
+            }
+            .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
+            .uploadResult ul li img {width: 100px;}
+
+            .star {position: relative;font-size: 2rem;color: #ddd;}
+            .star input {width: 100%;height: 100%;position: absolute;left: 0;
+              opacity: 0;cursor: pointer;}
+            .star span {width: 0;position: absolute; left: 0;color:#ffc83d;
+              overflow: hidden;pointer-events: none; -webkit-text-stroke:2px black;}
         </style>
-        <h1 class="mt-4">Board Modify Page</h1>
-        <form th:action="@{/board/modify}" th:method="post" id="frmSubmit">
+        <h1 class="mt-4">Movie Modify Page</h1>
+        <form th:action="@{/movie/register}" th:method="post">
             <div class="form-group">
-                <label for="title">Bno</label>
-                <input type="text" name="bno" id="bno" class="form-control" readonly
-                       th:value="${boardDTO.bno}">
+                <label for="mno">Mno</label>
+                <input type="text" name="mno" id="mno" class="form-control" readonly
+                       th:value="${movieDTO.mno}">
             </div>
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" name="title" id="title" class="form-control"
-                       th:value="${boardDTO.title}">
+                       th:value="${movieDTO.title}" readonly>
             </div>
             <div class="form-group">
-                <label for="content">Content</label>
-                <input type="text" name="content" id="content" class="form-control"
-                       th:value="${boardDTO.content}">
+                <label for="avg">Average</label>
+                <input type="text" name="avg" id="avg" class="form-control"
+                       th:value="${movieDTO.avg}" readonly>
             </div>
             <div class="form-group">
-                <label for="writerEmail">WriterEmail</label>
-                <input type="text" name="writerEmail" id="writerEmail" class="form-control"
-                       th:value="${boardDTO.writerEmail}" readonly>
+                <label for="reviewCnt">Review Count</label>
+                <input type="text" name="reviewCnt" id="reviewCnt" class="form-control"
+                       th:value="${movieDTO.reviewCnt}" readonly>
             </div>
             <div class="form-group">
                 <label for="regDate">RegDate</label>
-                <input type="text" id="regDate" class="form-control" th:value=
-                        "${#temporals.format(boardDTO.regDate, 'yyyy/MM/dd hh:mm')}" readonly>
+                <input type="text" name="regDate" id="regDate" class="form-control" readonly
+                       th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
-                <input type="text" id="modDate" class="form-control" th:value=
-                        "${#temporals.format(boardDTO.modDate, 'yyyy/MM/dd hh:mm')}" readonly>
+                <input type="text" name="modDate" id="modDate" class="form-control"readonly
+                       th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
+            <div class="box"></div>
             <div class="form-group">
-                <input type="hidden" name="page" th:value="${pageRequestDTO.page}">
-                <input type="hidden" name="type" th:value="${pageRequestDTO.type}">
-                <input type="hidden" name="keyword" th:value="${pageRequestDTO.keyword}">
                 <button class="btn btn-primary btnModi">Modify</button>
                 <button class="btn btn-danger btnDele">Delete</button>
                 <button class="btn btn-info btnBack">Back</button>
             </div>
+            <div class="uploadResult">
+                <ul>
+                    <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
+                        th:data-file="${movieImageDTO.getThumbnailURL}" style="cursor:pointer;">
+                        <img
+                                th:if="${movieImageDTO.path != null}"
+                                th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
+                    </li>
+                </ul>
+            </div>
         </form>
+        <div class="mt-4">
+            <span class="btn btn-outline-secondary" onclick="addReview()">Add Review</span>
+            <span style="font-size:9pt">리뷰:
+            <span id="revCnt" th:text="${movieDTO.reviewCnt}"></span> 개
+            </span>
+        </div>
+        <div class="list-group reviewList" style="margin: 20px 0;"></div>
+        <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
         <script th:inline="javascript">
-            btnModi = document.querySelector(".btnModi")
-            btnDele = document.querySelector(".btnDele")
-            btnBack = document.querySelector(".btnBack")
-            frmSubmit = document.querySelector("#frmSubmit")
-            btnModi.onclick = e => {
-                e.preventDefault();
-                //유효성 검사
-                frmSubmit.submit();
+            const mno = [[${movieDTO.mno}]]
+
+            window.onload = () => {
+                // 수정후 변경사항을 위한 모달
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),
+                    {backdrop: true});
+                var msg = [[${msg}]]
+                if(msg) {
+                    document.querySelector(".modal-body").innerHTML=`<p>${msg}되었습니다.</p>`
+                    document.querySelector("#exampleModalLabel")
+                        .innerHTML=`<p>${msg.split(" ")[2]}창</p>`
+                    myModal.show()
+                    history.replaceState({}, null, null)
+                }
+                loadReviewJSON() // 댓글을 REST하게 불러오는 함수
             }
-            btnDele.onclick = e => {
-                e.preventDefault();
-                frmSubmit.setAttribute('action', /*[[@{/board/remove}]]*/'remove')
-                frmSubmit.submit();
+            function loadReviewJSON(){
+                const reviewListGroup = document.querySelector(".reviewList")
+                const url = /*[[@{/reviews/}]]*/'url'
+
+                fetch(url+mno, {method: 'GET',})
+                .then(response => response.json())
+                .then(data => {
+                    //console.log(data)
+                    let str = "";
+                    for(let i=0;i<data.length;i++){
+                        str += `
+                            <div class="card-body form-control mb-1"
+                            onmouseover="this.style.background='#d6e6ff'"
+                            onmouseout="this.style.background='white'"
+                            data-reviewnum="${data[i].reviewnum}" data-text="${data[i].text}"
+                            data-nickname="${data[i].nickname}" data-grade="${data[i].grade}"
+                            data-mid="${data[i].mid}" data-email="${data[i].email}"
+                            style="padding:5px 20px;cursor:pointer;"
+                            onclick="revRead('${data[i].reviewnum}','${data[i].text}','${data[i].mid}','${data[i].grade}','${data[i].nickname}')"
+                            >
+                                <div style="display:inline-block;width:49%">
+                                    <h6 style="display:inline-block;width:70px">${data[i].reviewnum}</h6>
+                                    <h5 class="card-text" style="display:inline-block;">${data[i].text}
+                                    <span class="starRating" data-grade="${data[i].grade}"></span></h5>
+                                </div>
+                                <div style="display:inline-block;width:48%;text-align:right;right-padding:20px;">
+                                    <span class="card-subtitle text-muted">${data[i].nickname}</span>
+                                    <span class="card-subtitle text-muted"
+                                    style="display:inline-block;width:150px;color:rgb(148, 163, 184);"
+                                    >${formatDateTime(data[i].regDate)}</span>
+                                </div>
+                            </div>
+                        `
+                    }
+                    reviewListGroup.innerHTML = str
+
+                    const starRatings = document.querySelectorAll(".starRating")
+                    for(let i=0;i<starRatings.length;i++){
+                        let starStr = ''
+                        for(let j=0;j<starRatings[i].dataset.grade;j++){
+                            starStr += "⭐"
+                        }
+                        starRatings[i].innerHTML = starStr;
+                    }
+                })
             }
-            btnBack.onclick = e => {
-                e.preventDefault();
-                window.history.back();
+            function formatDateTime(str) {
+              const date = new Date(str)
+              return `${date.getFullYear()}/${len2(date.getMonth()+1)}`
+                 + `/${len2(date.getDate())} ${len2(date.getHours())}:`
+                 + `${len2(date.getMinutes())}`
             }
+            function len2(num) {
+              return (num<10) ? "0"+num : num;
+            }
+            function addReview(){
+                // 댓글 추가하기 위한 창 띄우기 함수
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                document.querySelector("#exampleModalLabel").textContent = "리뷰 추가 창"
+                document.querySelector(".modal-body").innerHTML = `
+                    <input type="text" class="form-control" name="mid" placeholder="Member ID(mid)" value="10">
+                    <label id="notice">Grade</label> <span class="star">★★★★★<span>★★★★★</span>
+                        <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
+                        </span><br>
+                    <input type="text" class="form-control" name="text" placeholder="Review Text...">
+                `
+                document.querySelector(".modal-footer").innerHTML = `
+                    <button type="button" class="btn btn-primary save" data-bs-dismiss="modal" onclick="revSave()">등록</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                `
+                myModal.show() // 댓글 입력을 위한 모달
+            }
+            function revSave() {
+                // 리뷰 등록 버튼
+                // 모달이 떠 있는 상태에서 등록 버튼누른 후 또 모달이 떠야 하기 때문에 모달을 초기화함.
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                let mid = document.querySelector(".modal-body input[name='mid']")
+                let text = document.querySelector(".modal-body input[name='text']")
+                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+
+                let notice = document.querySelector('#notice')
+
+                if(!mid.value) {modalNotice("입력","회원번호를 확인하여 주세요");return false;}
+                if(!text.value) {modalNotice("입력","리뷰 텍스트를 확인하여 주세요");return false;}
+                if(!grade) {modalNotice("입력","리뷰 별점을 확인하여 주세요");return false;}
+
+                let review = {mno: mno, text: text.value, mid: mid.value, grade: grade}
+
+                const url = /*[[@{/reviews}]]*/'url'
+                fetch(url, {
+                    method: 'POST', headers:{'Content-type': 'application/json'},
+                    body: JSON.stringify(review)
+                })
+                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                .then(function(data){
+                    let cnt = document.querySelector("#revCnt")
+                    cnt.textContent = parseInt(cnt.textContent) + 1;
+                    loadReviewJSON()
+                    modalNotice(`등록`, `${data}`)
+                })
+            }
+
+            // 리뷰 상세 보기
+            function revRead(reviewnum, text, mid, grade, nickname) {
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                document.querySelector("#exampleModalLabel").textContent = reviewnum +"번 리뷰 보기"
+                document.querySelector(".modal-body").innerHTML = `
+                    <input type="hidden" class="form-control" name="reviewnum" value="${reviewnum}" readonly>
+                    <input type="hidden" class="form-control" name="mid" value="${mid}">
+                    <label id="notice">Grade</label><span class="star">★★★★★<span>★★★★★</span>
+                    <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
+                    </span><br>
+                    <input type="text" class="form-control" name="text" value="${text}">
+                `
+                document.querySelector(".modal-footer").innerHTML = `
+                    <button type="button" class="btn btn-warning modify" data-bs-dismiss="modal" onclick="revModify('${reviewnum}')">수정</button>
+                    <button type="button" class="btn btn-danger remove" data-bs-dismiss="modal" onclick="revRemove('${reviewnum}')">삭제</button>
+                    <span class="btn btn-secondary" data-bs-dismiss="modal">닫기</span>
+                `
+                document.querySelector('.star span').style.width = `${grade * 20}%`
+
+                myModal.show() // 댓글 입력을 위한 모달
+            }
+            function revModify(reviewnum) {
+                let text = document.querySelector(".modal-body input[name='text']")
+                let mid = document.querySelector(".modal-body input[name='mid']")
+                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+
+                if(!text.value) {modalNotice("수정","리뷰 텍스트를 확인하여 주세요");return false;}
+                if(!grade) {modalNotice("수정","리뷰 별점을 확인하여 주세요");return false;}
+                let review = {mno: mno, text: text.value, mid: mid.value
+                              , grade: grade, reviewnum: reviewnum}
+
+                const url = /*[[@{/reviews}]]*/'url'
+                fetch(url, {
+                    method: 'PUT', headers:{'Content-type': 'application/json'},
+                    body: JSON.stringify(review)
+                })
+                .then(res => res.text())
+                .then(function(data){
+                    modalNotice(`수정`, `${data}`)
+                    loadReviewJSON()
+                })
+            }
+            function revRemove(reviewnum) {
+                const url = /*[[@{/reviews/}]]*/'url'
+                fetch(url+reviewnum, {
+                    method: 'DELETE', headers:{'Content-type': 'application/json'},
+                })
+                .then(res => res.text())
+                .then(function(data){
+                    let cnt = document.querySelector("#revCnt")
+                    cnt.textContent = parseInt(cnt.textContent) - 1;
+                    loadReviewJSON()
+                    modalNotice(`삭제`, `${data}`)
+                })
+            }
+            function drawStar(target){
+                document.querySelector('.star span').style.width = `${target.value * 10}%`
+            }
+            function modalNotice(title, msg) {
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                document.querySelector(".modal-body").innerHTML = `${msg}`
+                if(title == "수정" || title == "삭제") {
+                    document.querySelector("#exampleModalLabel").textContent = `리뷰 ${title}`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                } else if(title == "등록") {
+                    document.querySelector("#exampleModalLabel").textContent = `${title} 완료`
+                    document.querySelector(".modal-footer .save").style.display = 'none'
+                } else if(title == "입력") {
+                    document.querySelector("#exampleModalLabel").textContent = `${title} 오류`
+                    document.querySelector(".modal-footer .save").style.display = 'none'
+                }
+                myModal.show()
+            }
+
         </script>
     </th:block>
 </th:block>

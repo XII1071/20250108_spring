@@ -25,18 +25,18 @@ public class ReviewController {
 
   @PostMapping(value = {"", "/"})
   public ResponseEntity<String> register(@RequestBody ReviewDTO reviewDTO) {
-    return new ResponseEntity<>(reviewService.register(reviewDTO)+"번 댓글 등록", HttpStatus.OK);
+    return new ResponseEntity<>(reviewService.register(reviewDTO)+"번 리뷰 등록", HttpStatus.OK);
   }
 
   @PutMapping(value = {"", "/"})
   public ResponseEntity<String> modify(@RequestBody ReviewDTO reviewDTO) {
     reviewService.modify(reviewDTO);
-    return new ResponseEntity<>(reviewDTO.getReviewnum()+ "번 댓글 수정", HttpStatus.OK);
+    return new ResponseEntity<>(reviewDTO.getReviewnum()+ "번 리뷰 수정", HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/{reviewnum}")
   public ResponseEntity<String> delete(@PathVariable Long reviewnum) {
     reviewService.remove(reviewnum);
-    return new ResponseEntity<>(reviewnum + "번 댓글 삭제", HttpStatus.OK);
+    return new ResponseEntity<>(reviewnum + "번 리뷰 삭제", HttpStatus.OK);
   }
 }

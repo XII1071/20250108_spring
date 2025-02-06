@@ -178,17 +178,18 @@
                 myModal.show() // 댓글 입력을 위한 모달
             }
             function revSave() {
-                // 댓글 등록 버튼
+                // 리뷰 등록 버튼
                 // 모달이 떠 있는 상태에서 등록 버튼누른 후 또 모달이 떠야 하기 때문에 모달을 초기화함.
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 let mid = document.querySelector(".modal-body input[name='mid']")
                 let text = document.querySelector(".modal-body input[name='text']")
                 let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+
                 let notice = document.querySelector('#notice')
 
+                if(!mid.value) {modalNotice("입력","회원번호를 확인하여 주세요");return false;}
                 if(!text.value) {modalNotice("입력","리뷰 텍스트를 확인하여 주세요");return false;}
                 if(!grade) {modalNotice("입력","리뷰 별점을 확인하여 주세요");return false;}
-                if(!mid.value) {modalNotice("입력","회원번호를 확인하여 주세요");return false;}
 
                 let review = {mno: mno, text: text.value, mid: mid.value, grade: grade}
 
@@ -206,6 +207,7 @@
                 })
             }
 
+            // 리뷰 상세 보기
             function revRead(reviewnum, text, mid, grade, nickname) {
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 document.querySelector("#exampleModalLabel").textContent = reviewnum +"번 리뷰 보기"
@@ -227,8 +229,6 @@
                 myModal.show() // 댓글 입력을 위한 모달
             }
             function revModify(reviewnum) {
-                // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 let text = document.querySelector(".modal-body input[name='text']")
                 let mid = document.querySelector(".modal-body input[name='mid']")
                 let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
@@ -238,7 +238,6 @@
                 let review = {mno: mno, text: text.value, mid: mid.value
                               , grade: grade, reviewnum: reviewnum}
 
-                // console.log(JSON.stringify(review))
                 const url = /*[[@{/reviews}]]*/'url'
                 fetch(url, {
                     method: 'PUT', headers:{'Content-type': 'application/json'},
@@ -270,7 +269,7 @@
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 document.querySelector(".modal-body").innerHTML = `${msg}`
                 if(title == "수정" || title == "삭제") {
-                    document.querySelector("#exampleModalLabel").textContent = `${title} 완료`
+                    document.querySelector("#exampleModalLabel").textContent = `리뷰 ${title}`
                     document.querySelector(".modal-footer .modify").style.display = 'none'
                     document.querySelector(".modal-footer .remove").style.display = 'none'
                 } else if(title == "등록") {
