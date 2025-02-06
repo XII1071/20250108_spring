@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
-  // 클라이언트 들고올 땐 dto
-  // Repository 들고올 땐 entity
-
 
   @Override
   public Long register(ReviewDTO reviewDTO) {
@@ -30,25 +27,23 @@ public class ReviewServiceImpl implements ReviewService {
 
   @Override
   public List<ReviewDTO> getList(Long mno) {
-    List<Review> result = reviewRepository.findByMovie(Movie.builder()
-        .mno(mno).build());
-    return result.stream().map(review -> entityToDto(review))
-        .collect(Collectors.toList());
-
+    List<Review> result = reviewRepository
+        .findByMovie(Movie.builder().mno(mno).build());
+    return result.stream().map(
+        review -> entityToDto(review)).collect(Collectors.toList()
+    );
   }
 
   @Override
   public void modify(ReviewDTO reviewDTO) {
-    log.info(reviewDTO);
-    Optional<Review> result = reviewRepository.findById(reviewDTO.getMno());
+    Optional<Review> result = reviewRepository.findById(reviewDTO.getReviewnum());
     if (result.isPresent()) {
       Review review = result.get();
       /* 리뷰에서 변경할 텍스트, 별점(grade) */
-      review.changeText(reviewDTO.getText());
       review.changeGrade(reviewDTO.getGrade());
+      review.changeText(reviewDTO.getText());
       reviewRepository.save(review);
     }
-
   }
 
   @Override

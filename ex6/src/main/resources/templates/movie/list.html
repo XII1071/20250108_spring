@@ -43,8 +43,8 @@
                 <td><img
                         th:if="${movieDTO.imageDTOList.size()>0 && movieDTO.imageDTOList[0].path != null}"
                         th:src="|@{/display(fileName=${movieDTO.imageDTOList[0].getThumbnailURL()})}|">[[${movieDTO.title}]]</td>
-                <td><b th:text="${movieDTO.reviewCnt}"></b></td>
                 <td><b th:text="${movieDTO.avg}"></b></td>
+                <td><b th:text="${movieDTO.reviewCnt}"></b></td>
                 <td>[[${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}]]</td>
             </tr>
             </tbody>

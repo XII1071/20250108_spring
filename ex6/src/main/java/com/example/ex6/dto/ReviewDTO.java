@@ -1,9 +1,9 @@
 package com.example.ex6.dto;
 
-import lombok.*;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ReviewDTO {
   private Long reviewnum;
-  private Long mno;
-  private Long mid;
+  private Long mno; // Movie
+  private Long mid; // Member
   private String nickname;
   private String email;
   private int grade;

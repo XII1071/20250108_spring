@@ -20,6 +20,7 @@ public class PageRequestDTO {
     this.page = 1;this.size = 10;
   }
 
+  // 이건 내장된 인터페이스 pageble 입니까? -> Y
   public Pageable getPageable(Sort sort) {
     return PageRequest.of(page - 1, size, sort);
   }

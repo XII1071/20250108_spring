@@ -11,6 +11,12 @@
             }
             .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
             .uploadResult ul li img {width: 100px;}
+
+            .star {position: relative;font-size: 2rem;color: #ddd;}
+            .star input {width: 100%;height: 100%;position: absolute;left: 0;
+              opacity: 0;cursor: pointer;}
+            .star span {width: 0;position: absolute; left: 0;color:#ffc83d;
+              overflow: hidden;pointer-events: none; -webkit-text-stroke:2px black;}
         </style>
         <h1 class="mt-4">Movie Read Page</h1>
         <form th:action="@{/movie/register}" th:method="post">
@@ -101,7 +107,7 @@
             }
             function loadReviewJSON(){
                 const reviewListGroup = document.querySelector(".reviewList")
-                const url = /*[[@{/reviews/movie/}]]*/'url'
+                const url = /*[[@{/reviews/}]]*/'url'
 
                 fetch(url+mno, {method: 'GET',})
                 .then(response => response.json())
@@ -117,14 +123,15 @@
                             data-nickname="${data[i].nickname}" data-grade="${data[i].grade}"
                             data-mid="${data[i].mid}" data-email="${data[i].email}"
                             style="padding:5px 20px;cursor:pointer;"
-                            onclick="revRead('${data[i].reviewnum}','${data[i].text}','${data[i].replyer}')"
+                            onclick="revRead('${data[i].reviewnum}','${data[i].text}','${data[i].mid}','${data[i].grade}','${data[i].nickname}')"
                             >
                                 <div style="display:inline-block;width:49%">
                                     <h6 style="display:inline-block;width:70px">${data[i].reviewnum}</h6>
-                                    <h5 class="card-text" style="display:inline-block;">${data[i].text}</h5>
+                                    <h5 class="card-text" style="display:inline-block;">${data[i].text}
+                                    <span class="starRating" data-grade="${data[i].grade}"></span></h5>
                                 </div>
                                 <div style="display:inline-block;width:48%;text-align:right;right-padding:20px;">
-                                    <span class="card-subtitle text-muted">${data[i].replyer}</span>
+                                    <span class="card-subtitle text-muted">${data[i].nickname}</span>
                                     <span class="card-subtitle text-muted"
                                     style="display:inline-block;width:150px;color:rgb(148, 163, 184);"
                                     >${formatDateTime(data[i].regDate)}</span>
@@ -133,6 +140,15 @@
                         `
                     }
                     reviewListGroup.innerHTML = str
+
+                    const starRatings = document.querySelectorAll(".starRating")
+                    for(let i=0;i<starRatings.length;i++){
+                        let starStr = ''
+                        for(let j=0;j<starRatings[i].dataset.grade;j++){
+                            starStr += "⭐"
+                        }
+                        starRatings[i].innerHTML = starStr;
+                    }
                 })
             }
             function formatDateTime(str) {
@@ -147,49 +163,46 @@
             function addReview(){
                 // 댓글 추가하기 위한 창 띄우기 함수
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                document.querySelector("#exampleModalLabel").textContent = "댓글 추가 창"
+                document.querySelector("#exampleModalLabel").textContent = "리뷰 추가 창"
                 document.querySelector(".modal-body").innerHTML = `
-                    <input type="text" class="form-control" name="text" placeholder="댓글...">
-                    <input type="text" class="form-control" name="replyer" value="user50@a.a">
+                    <input type="text" class="form-control" name="mid" placeholder="Member ID(mid)" value="10">
+                    <label id="notice">Grade</label> <span class="star">★★★★★<span>★★★★★</span>
+                        <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
+                        </span><br>
+                    <input type="text" class="form-control" name="text" placeholder="Review Text...">
                 `
                 document.querySelector(".modal-footer").innerHTML = `
-                    <button type="button" class="btn btn-primary save" data-bs-dismiss="modal" onclick="repSave()">등록</button>
+                    <button type="button" class="btn btn-primary save" data-bs-dismiss="modal" onclick="revSave()">등록</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 `
                 myModal.show() // 댓글 입력을 위한 모달
             }
-            function repSave() {
+            function revSave() {
                 // 댓글 등록 버튼
                 // 모달이 떠 있는 상태에서 등록 버튼누른 후 또 모달이 떠야 하기 때문에 모달을 초기화함.
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                let mid = document.querySelector(".modal-body input[name='mid']")
                 let text = document.querySelector(".modal-body input[name='text']")
-                let replyer = document.querySelector(".modal-body input[name='replyer']")
-                if(!text.value) {
-                    text.setAttribute('placeholder', '댓글을 확인하세요')
-                    text.focus()
-                    return;
-                }
-                if(!replyer.value) {
-                    replyer.setAttribute('placeholder', '작성자를 확인하세요')
-                    replyer.focus();
-                    return;
-                }
-                let reply = {mno: mno, text: text.value, replyer: replyer.value}
-                //alert(JSON.stringify(reply))
+                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+                let notice = document.querySelector('#notice')
+
+                if(!text.value) {modalNotice("입력","리뷰 텍스트를 확인하여 주세요");return false;}
+                if(!grade) {modalNotice("입력","리뷰 별점을 확인하여 주세요");return false;}
+                if(!mid.value) {modalNotice("입력","회원번호를 확인하여 주세요");return false;}
+
+                let review = {mno: mno, text: text.value, mid: mid.value, grade: grade}
+
                 const url = /*[[@{/reviews}]]*/'url'
                 fetch(url, {
                     method: 'POST', headers:{'Content-type': 'application/json'},
-                    body: JSON.stringify(reply)
+                    body: JSON.stringify(review)
                 })
                 .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
                 .then(function(data){
-                    document.querySelector("#exampleModalLabel").textContent = "댓글 등록 완료"
-                    document.querySelector(".modal-body").innerHTML = `${data} 알림`
-                    document.querySelector(".modal-footer .save").style.display = 'none'
                     let cnt = document.querySelector("#revCnt")
                     cnt.textContent = parseInt(cnt.textContent) + 1;
-                    myModal.show() // 댓글 등록 완료 모달
                     loadReviewJSON()
+                    modalNotice(`등록`, `${data}`)
                 })
             }
 
@@ -199,7 +212,7 @@
                 document.querySelector(".modal-body").innerHTML = `
                     <input type="hidden" class="form-control" name="reviewnum" value="${reviewnum}" readonly>
                     <input type="hidden" class="form-control" name="mid" value="${mid}">
-                    <label id="notion">Grade</label><span class="star">★★★★★<span>★★★★★</span>
+                    <label id="notice">Grade</label><span class="star">★★★★★<span>★★★★★</span>
                     <input type="range" oninput="drawStar(this)" value="1" step="2" min="0" max="10">
                     </span><br>
                     <input type="text" class="form-control" name="text" value="${text}">
@@ -209,54 +222,65 @@
                     <button type="button" class="btn btn-danger remove" data-bs-dismiss="modal" onclick="revRemove('${reviewnum}')">삭제</button>
                     <span class="btn btn-secondary" data-bs-dismiss="modal">닫기</span>
                 `
+                document.querySelector('.star span').style.width = `${grade * 20}%`
+
                 myModal.show() // 댓글 입력을 위한 모달
             }
             function revModify(reviewnum) {
                 // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
                 let text = document.querySelector(".modal-body input[name='text']")
-                if(!text.value) {
-                    text.setAttribute('placeholder', '댓글을 확인하세요')
-                    text.focus()
-                    return;
-                }
-                let reply = {reviewnum: reviewnum, text: text.value}
-                //alert(JSON.stringify(reply))
+                let mid = document.querySelector(".modal-body input[name='mid']")
+                let grade = parseFloat(document.querySelector(".star span").style.width)*0.01*5;
+
+                if(!text.value) {modalNotice("수정","리뷰 텍스트를 확인하여 주세요");return false;}
+                if(!grade) {modalNotice("수정","리뷰 별점을 확인하여 주세요");return false;}
+                let review = {mno: mno, text: text.value, mid: mid.value
+                              , grade: grade, reviewnum: reviewnum}
+
+                // console.log(JSON.stringify(review))
                 const url = /*[[@{/reviews}]]*/'url'
                 fetch(url, {
                     method: 'PUT', headers:{'Content-type': 'application/json'},
-                    body: JSON.stringify(reply)
+                    body: JSON.stringify(review)
                 })
-                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                .then(res => res.text())
                 .then(function(data){
-                    document.querySelector("#exampleModalLabel").textContent = "리뷰 수정 완료"
-                    document.querySelector(".modal-body").innerHTML = `${data} 알림`
-                    document.querySelector(".modal-footer .modify").style.display = 'none'
-                    document.querySelector(".modal-footer .remove").style.display = 'none'
-                    myModal.show()
+                    modalNotice(`수정`, `${data}`)
                     loadReviewJSON()
                 })
             }
-            function repRemove(reviewnum) {
-                // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
-                let reply = {reviewnum: reviewnum}
-                const url = /*[[@{/reviews}]]*/'url'
-                fetch(url, {
+            function revRemove(reviewnum) {
+                const url = /*[[@{/reviews/}]]*/'url'
+                fetch(url+reviewnum, {
                     method: 'DELETE', headers:{'Content-type': 'application/json'},
-                    body: JSON.stringify(reply)
                 })
-                .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
+                .then(res => res.text())
                 .then(function(data){
-                    document.querySelector("#exampleModalLabel").textContent = "리뷰 삭제 완료"
-                    document.querySelector(".modal-body").innerHTML = `${data} 알림`
-                    document.querySelector(".modal-footer .modify").style.display = 'none'
-                    document.querySelector(".modal-footer .remove").style.display = 'none'
                     let cnt = document.querySelector("#revCnt")
                     cnt.textContent = parseInt(cnt.textContent) - 1;
-                    myModal.show()
                     loadReviewJSON()
+                    modalNotice(`삭제`, `${data}`)
                 })
+            }
+            function drawStar(target){
+                document.querySelector('.star span').style.width = `${target.value * 10}%`
+            }
+            function modalNotice(title, msg) {
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop: true});
+                document.querySelector(".modal-body").innerHTML = `${msg}`
+                if(title == "수정" || title == "삭제") {
+                    document.querySelector("#exampleModalLabel").textContent = `${title} 완료`
+                    document.querySelector(".modal-footer .modify").style.display = 'none'
+                    document.querySelector(".modal-footer .remove").style.display = 'none'
+                } else if(title == "등록") {
+                    document.querySelector("#exampleModalLabel").textContent = `${title} 완료`
+                    document.querySelector(".modal-footer .save").style.display = 'none'
+                } else if(title == "입력") {
+                    document.querySelector("#exampleModalLabel").textContent = `${title} 오류`
+                    document.querySelector(".modal-footer .save").style.display = 'none'
+                }
+                myModal.show()
             }
 
         </script>
