@@ -1,6 +1,9 @@
 package com.example.ex6.controller;
 
 import com.example.ex6.dto.UploadResultDTO;
+import com.example.ex6.service.MovieService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +31,10 @@ import java.util.UUID;
 
 @RestController
 @Log4j2
+@RequiredArgsConstructor
 public class UploadController {
+
+  private final MovieService movieService;
 
   @Value("${com.example.upload.path}")
   private String uploadPath;
@@ -99,11 +105,16 @@ public class UploadController {
     return result;
   }
 
+  @Transactional
   @PostMapping("/removeFile")
-  public ResponseEntity<Boolean> removeFile(String fileName) {
+  public ResponseEntity<Boolean> removeFile(String fileName, String uuid) {
     log.info("<<", fileName);
     ResponseEntity<Boolean> result = null;
     String srchFileName = null;
+
+    if (uuid != null) {
+      movieService.removeMovieImagebyUUID(uuid);
+    }
 
     try {
       srchFileName = URLDecoder.decode(fileName, "UTF-8");

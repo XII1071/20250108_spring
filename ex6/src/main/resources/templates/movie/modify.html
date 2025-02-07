@@ -178,7 +178,7 @@
                 const targetLi = btn.closest('li')
                 const fileName = targetLi.dataset.file;
                 const uuid = targetLi.dataset.uuid;
-                /*
+
                 fetch(removeUrl+fileName+"&uuid="+uuid, {
                   method: 'POST', dataType: 'json', fileName: fileName
                 })
@@ -188,7 +188,6 @@
                   if(json === true) targetLi.remove()
                 })
                 .catch(err => console.log("Error occurred: ", err))
-                */
                 targetLi.remove()
             }
 

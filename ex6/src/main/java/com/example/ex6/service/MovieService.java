@@ -28,6 +28,7 @@ public interface MovieService {
 
   MovieDTO get(Long mno);
 
+  void removeMovieImagebyUUID(String uuid);
   default Map<String, Object> dtoToEntity(MovieDTO movieDTO) {
     System.out.println(movieDTO);
     Map<String, Object> entityMap = new HashMap<>();
