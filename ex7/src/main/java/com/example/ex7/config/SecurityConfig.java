@@ -29,7 +29,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
-      "/" // <- 이것만 했을때도 index로 간다.
+      "/"
   };
 
   // spring security의 세션방식 기반으로 대부분의 설정 가능

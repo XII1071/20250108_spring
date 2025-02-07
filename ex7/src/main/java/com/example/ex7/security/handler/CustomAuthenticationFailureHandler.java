@@ -1,4 +1,3 @@
-
 package com.example.ex7.security.handler;
 
 import jakarta.servlet.ServletException;
