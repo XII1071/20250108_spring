@@ -2,6 +2,7 @@ package com.example.ex7.config;
 
 import com.example.ex7.security.handler.CustomAuthenticationFailureHandler;
 import com.example.ex7.security.handler.CustomLoginSuccessHandler;
+import com.example.ex7.security.handler.CustomLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +75,20 @@ public class SecurityConfig {
 
       }
     });
-    return httpSecurity.build();
+
+    httpSecurity.logout(new Customizer<LogoutConfigurer<HttpSecurity>>() {
+      @Override
+      public void customize(LogoutConfigurer<HttpSecurity> httpSecurityLogoutConfigurer) {
+        httpSecurityLogoutConfigurer
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/")
+            .logoutSuccessHandler(getCustomLogoutSuccessHandler())
+            .invalidateHttpSession(true)
+        ;
+      }
+    });
+
+    return httpSecurity.build();  //SecurityFilterChain 타입의 프록시 객체가 리턴
   }
 
   @Bean
@@ -88,6 +104,11 @@ public class SecurityConfig {
   @Bean
   public AuthenticationFailureHandler getAuthenticationFailureHandler() {
     return new CustomAuthenticationFailureHandler();
+  }
+
+  @Bean
+  public LogoutSuccessHandler getCustomLogoutSuccessHandler() {
+    return new CustomLogoutSuccessHandler();
   }
 
   // InMemory 방식으로 UserDetailsService(인증 관리 객체) 사용
