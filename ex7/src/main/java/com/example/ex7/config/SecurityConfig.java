@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.User;
@@ -38,11 +39,20 @@ public class SecurityConfig {
   // spring security의 세션방식 기반으로 대부분의 설정 가능
   @Bean
   protected SecurityFilterChain config(HttpSecurity httpSecurity) throws Exception {
+
+    httpSecurity.csrf(new Customizer<CsrfConfigurer<HttpSecurity>>() {
+      @Override
+      public void customize(CsrfConfigurer<HttpSecurity> httpSecurityCsrfConfigurer) {
+        httpSecurityCsrfConfigurer.disable();
+      }
+    });
+
     httpSecurity.authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<org.springframework.security.config.annotation.web.builders.HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
       @Override
       public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth.requestMatchers(AUTH_WHITELIST).permitAll()  //모두 수용 복수 지정때는 String배열로 적용
             .requestMatchers("/sample/all/**").permitAll()//모두 수용 단독 지정때는 주소와 "**" 덧붙임.
+            //.requestMatchers("/sample/login/**").permitAll()//커스텀 로그인 사용시 모두 허용
             .requestMatchers("/sample/admin").hasRole("ADMIN") //권한이 단수일 때
             .requestMatchers("/sample/manager").access(  //권한이 복수일 때
                 new WebExpressionAuthorizationManager(
@@ -59,8 +69,12 @@ public class SecurityConfig {
       public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
         // 내용은 없어도 기본적으로 /login 페이지로 이동 가능
 
-        // 커스텀 로그인 페이지로 이동할 때
-        //httpSecurityFormLoginConfigurer.loginPage("/sample/login");
+
+        /*httpSecurityFormLoginConfigurer
+            // 커스텀로그인페이지등록시 컨트롤러와 permitAll()을 지정해줘야 한다.
+            .loginPage("/sample/login") // 커스텀 로그인 페이지 주소
+            .loginProcessingUrl("/loginProc") // 커스텀 로그인 처리 주소
+        ;*/
 
         // 로그인을 성공했을 때 이동할 페이지 지정
         //httpSecurityFormLoginConfigurer.loginProcessingUrl("/sample/main");
@@ -84,7 +98,7 @@ public class SecurityConfig {
             .logoutSuccessUrl("/")
             .logoutSuccessHandler(getCustomLogoutSuccessHandler())
             .invalidateHttpSession(true)
-        ;
+            ;
       }
     });
 
