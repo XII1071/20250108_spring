@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.configurers.AuthorizeH
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2ClientConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -101,6 +103,14 @@ public class SecurityConfig {
             ;
       }
     });
+    httpSecurity.oauth2Login(new Customizer<OAuth2LoginConfigurer<HttpSecurity>>() {
+      @Override
+      public void customize(OAuth2LoginConfigurer<HttpSecurity> httpSecurityOAuth2LoginConfigurer) {
+        httpSecurityOAuth2LoginConfigurer.successHandler(
+            getAuthenticationSuccessHandler()
+        );
+      }
+    });
 
     return httpSecurity.build();  //SecurityFilterChain 타입의 프록시 객체가 리턴
   }
@@ -125,6 +135,7 @@ public class SecurityConfig {
     return new CustomLogoutSuccessHandler();
   }
 
+ /* 
   // InMemory 방식으로 UserDetailsService(인증 관리 객체) 사용
   @Bean
   public UserDetailsService userDetailsService() {
@@ -149,6 +160,6 @@ public class SecurityConfig {
     list.add(admin);
     return new InMemoryUserDetailsManager(list);
 
-  }
+  }*/ // 인메모리 방식 DB와 같이 사용할수 없어서 인메모리는 주석
 
 }
