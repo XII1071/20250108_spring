@@ -71,4 +71,5 @@ public interface MovieService {
     return movieDTO;
   }
 
+  void modify(MovieDTO movieDTO);
 }

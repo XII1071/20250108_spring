@@ -39,6 +39,18 @@ public class MovieController {
   public void get(Long mno, PageRequestDTO pageRequestDTO, Model model) {
     model.addAttribute("movieDTO", movieService.get(mno));
   }
+
+  @PostMapping("/modify")
+  public String modify(MovieDTO movieDTO,
+                       PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
+    movieService.modify(movieDTO);
+    ra.addFlashAttribute("msg", movieDTO.getMno() + "번 게시물이 수정");
+    ra.addAttribute("bno", movieDTO.getMno());
+    ra.addAttribute("page", pageRequestDTO.getPage());
+    ra.addAttribute("type", pageRequestDTO.getType());
+    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
+    return "redirect:/movie/list";
+  }
 }
 
 

@@ -1,6 +1,7 @@
 package com.example.ex6.service;
 
 import com.example.ex6.dto.MovieDTO;
+import com.example.ex6.dto.MovieImageDTO;
 import com.example.ex6.dto.PageRequestDTO;
 import com.example.ex6.dto.PageResultDTO;
 import com.example.ex6.entity.Movie;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -79,7 +77,18 @@ public class MovieServiceImpl implements MovieService {
   }
 
   @Override
+  public void modify(MovieDTO movieDTO) {
+    Optional<Movie> result = movieRepository.findById(movieDTO.getMno());
+    if (result.isPresent()) {
+      Movie movie = result.get();
+      movie.changeTitle(movieDTO.getTitle());
+      movieRepository.save(movie);
+    }
+  }
+
+  @Override
   public void removeMovieImagebyUUID(String uuid) {
     movieImageRepository.deleteByUuid(uuid);
+    movieRepository.deleteById(Long.valueOf(uuid));
   }
 }
