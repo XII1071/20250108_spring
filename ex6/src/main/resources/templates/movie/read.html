@@ -58,9 +58,7 @@
                 <ul>
                     <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
                         th:data-file="${movieImageDTO.getThumbnailURL}" style="cursor:pointer;">
-                        <img
-                                th:if="${movieImageDTO.path != null}"
-                                th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
+                        <img th:src="@{|/display?fileName=${movieImageDTO.path}/${movieImageDTO.uuid}_${movieImageDTO.imgName}|}" width="100" height="100">
                     </li>
                 </ul>
             </div>

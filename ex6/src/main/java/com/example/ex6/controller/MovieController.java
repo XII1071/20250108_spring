@@ -26,7 +26,8 @@ public class MovieController {
   }
 
   @GetMapping("/register")
-  public void register() {  }
+  public void register() {
+  }
 
   @PostMapping("/register")
   public String register(MovieDTO movieDTO, RedirectAttributes ra) {
@@ -51,7 +52,6 @@ public class MovieController {
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
-
     return "redirect:/movie/read"; // ✅ read로 이동
   }
 

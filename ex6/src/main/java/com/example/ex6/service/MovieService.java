@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 
 public interface MovieService {
 
+    void addMovieImage(Long mno, MovieImageDTO movieImageDTO);
+
+    void deleteMovieImage(String uuid);
+
     PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 
     Long register(MovieDTO movieDTO);

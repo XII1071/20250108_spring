@@ -16,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -28,6 +31,16 @@ public class MovieServiceImpl implements MovieService {
   private final MovieImageRepository movieImageRepository;
   @Value("${com.example.upload.path}")
   private String uploadPath;
+
+  @Override
+  public void addMovieImage(Long mno, MovieImageDTO movieImageDTO) {
+
+  }
+
+  @Override
+  public void deleteMovieImage(String uuid) {
+
+  }
 
   @Override
   public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
@@ -78,31 +91,12 @@ public class MovieServiceImpl implements MovieService {
 
   @Override
   public void modify(MovieDTO movieDTO) {
-    Optional<Movie> result = movieRepository.findById(movieDTO.getMno());
-    if (result.isPresent()) {
-      Movie movie = result.get();
-      movie.changeTitle(movieDTO.getTitle());
-      movieRepository.save(movie);
 
-      List<MovieImageDTO> movieImageList = movieDTO.getImageDTOList();
-      List<MovieImage> imgs = movieImageRepository.findAll();
-      imgs.forEach(movieImage -> {
-        if(Objects.equals(movie.getMno(), movieImage.getMovie().getMno()))
-        {
-          movieImageRepository.deleteByUuid(movieImage.getUuid());
-        }
-      });
-
-      movieImageList.forEach(movieimage -> {
-//        movieImageRepository.save(dtoToEntity());
-
-      });
-    }
   }
+
 
   @Override
   public void removeMovieImagebyUUID(String uuid) {
     movieImageRepository.deleteByUuid(uuid);
-    movieRepository.deleteById(Long.valueOf(uuid));
   }
 }
