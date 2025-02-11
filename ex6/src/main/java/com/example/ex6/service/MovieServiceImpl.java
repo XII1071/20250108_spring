@@ -82,7 +82,21 @@ public class MovieServiceImpl implements MovieService {
     if (result.isPresent()) {
       Movie movie = result.get();
       movie.changeTitle(movieDTO.getTitle());
-      movieRepository.save(movie);
+        movieRepository.save(movie);
+
+      List<MovieImageDTO> movieImageList = movieDTO.getImageDTOList();
+      List<MovieImage> imgs = movieImageRepository.findAll();
+      imgs.forEach(movieImage -> {
+        if(Objects.equals(movie.getMno(), movieImage.getMovie().getMno()))
+        {
+          movieImageRepository.deleteByUuid(movieImage.getUuid());
+        }
+      });
+
+      movieImageList.forEach(movieimage -> {
+//        movieImageRepository.save(dtoToEntity());
+
+      });
     }
   }
 

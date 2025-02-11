@@ -1,6 +1,7 @@
 
 package com.example.ex6.entity;
 
+import com.example.ex6.dto.MovieImageDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +22,12 @@ public class Movie extends BaseEntity {
 
   private String title; //title: 영화의 제목을 저장하는 필드
 
+
   public void changeTitle(String title) { // changeTitle: 타이틀은 글자로 바꿔주는
     this.title = title; // 현재 Movie 객체의 title 필드를 의미하며, 전달받은 title 값으로 변경합니다.
   }
+
+  public void imgDtoList(MovieImageDTO movieImageDTO) {
+    this.imgDtoList(movieImageDTO);
+    }
 }

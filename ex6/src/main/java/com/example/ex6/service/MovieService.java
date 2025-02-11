@@ -21,6 +21,8 @@ public interface MovieService {
 
     MovieDTO get(Long mno);
 
+    void modify(MovieDTO movieDTO);
+
     void removeMovieImagebyUUID(String uuid);
 
     default Map<String, Object> dtoToEntity(MovieDTO movieDTO) {
@@ -34,11 +36,11 @@ public interface MovieService {
         if (imageDTOList != null && imageDTOList.size() > 0) {
             List<MovieImage> movieImageList = imageDTOList.stream().map(movieImageDTO -> {
                 MovieImage movieImage = MovieImage.builder()
-                        .path(movieImageDTO.getPath())
-                        .imgName(movieImageDTO.getImgName())
-                        .uuid(movieImageDTO.getUuid())
-                        .movie(movie)
-                        .build();
+                    .path(movieImageDTO.getPath())
+                    .imgName(movieImageDTO.getImgName())
+                    .uuid(movieImageDTO.getUuid())
+                    .movie(movie)
+                    .build();
                 return movieImage;
             }).collect(Collectors.toList());
             entityMap.put("imgList", movieImageList);
@@ -49,19 +51,19 @@ public interface MovieService {
     default MovieDTO entityToDTO(Movie movie, List<MovieImage> movieImages,
                                  Double avg, Long reviewCnt) {
         MovieDTO movieDTO = MovieDTO.builder()
-                .mno(movie.getMno())
-                .title(movie.getTitle())
-                .regDate(movie.getRegDate())
-                .modDate(movie.getModDate())
-                .build();
+            .mno(movie.getMno())
+            .title(movie.getTitle())
+            .regDate(movie.getRegDate())
+            .modDate(movie.getModDate())
+            .build();
         List<MovieImageDTO> movieImageDTOList = new ArrayList<>();
         if (movieImages.size() > 0 && movieImages.get(0) != null) {
             movieImageDTOList = movieImages.stream().map(movieImage -> {
                 MovieImageDTO movieImageDTO = MovieImageDTO.builder()
-                        .imgName(movieImage.getImgName())
-                        .path(movieImage.getPath())
-                        .uuid(movieImage.getUuid())
-                        .build();
+                    .imgName(movieImage.getImgName())
+                    .path(movieImage.getPath())
+                    .uuid(movieImage.getUuid())
+                    .build();
                 return movieImageDTO;
             }).collect(Collectors.toList());
         }
@@ -71,9 +73,4 @@ public interface MovieService {
         return movieDTO;
     }
 
-<<<<<<< HEAD
-  void modify(MovieDTO movieDTO);
 }
-=======
-}
->>>>>>> 410060fff10f3a991975d0a77bc075b4a165edfd
