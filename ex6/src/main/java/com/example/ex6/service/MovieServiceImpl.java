@@ -82,7 +82,7 @@ public class MovieServiceImpl implements MovieService {
     if (result.isPresent()) {
       Movie movie = result.get();
       movie.changeTitle(movieDTO.getTitle());
-        movieRepository.save(movie);
+      movieRepository.save(movie);
 
       List<MovieImageDTO> movieImageList = movieDTO.getImageDTOList();
       List<MovieImage> imgs = movieImageRepository.findAll();
