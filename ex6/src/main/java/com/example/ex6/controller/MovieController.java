@@ -45,12 +45,17 @@ public class MovieController {
                        PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
     movieService.modify(movieDTO);
     ra.addFlashAttribute("msg", movieDTO.getMno() + "번 게시물이 수정");
-    ra.addAttribute("bno", movieDTO.getMno());
+
+    // ✅ `mno`를 URL 파라미터로 넘겨주기
+    ra.addAttribute("mno", movieDTO.getMno());
     ra.addAttribute("page", pageRequestDTO.getPage());
     ra.addAttribute("type", pageRequestDTO.getType());
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
-    return "redirect:/movie/list";
+
+    return "redirect:/movie/read"; // ✅ read로 이동
   }
+
+
 }
 
 
