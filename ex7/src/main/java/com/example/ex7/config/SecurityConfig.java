@@ -45,7 +45,7 @@ public class SecurityConfig {
     httpSecurity.csrf(new Customizer<CsrfConfigurer<HttpSecurity>>() {
       @Override
       public void customize(CsrfConfigurer<HttpSecurity> httpSecurityCsrfConfigurer) {
-        httpSecurityCsrfConfigurer.disable();
+        httpSecurityCsrfConfigurer.disable(); //csrf 사용안함:풀스택에서는 세션말고 토큰으로 인증함.
       }
     });
 
@@ -54,7 +54,8 @@ public class SecurityConfig {
       public void customize(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth.requestMatchers(AUTH_WHITELIST).permitAll()  //모두 수용 복수 지정때는 String배열로 적용
             .requestMatchers("/sample/all/**").permitAll()//모두 수용 단독 지정때는 주소와 "**" 덧붙임.
-            //.requestMatchers("/sample/login/**").permitAll()//커스텀 로그인 사용시 모두 허용
+            .requestMatchers("/sample/login/**").permitAll()//커스텀 로그인 사용시 모두 허용
+            .requestMatchers("/sample/manager/**").hasRole("MANAGER")//커스텀 로그인 사용시 모두 허용
             .requestMatchers("/sample/admin").hasRole("ADMIN") //권한이 단수일 때
             .requestMatchers("/sample/manager").access(  //권한이 복수일 때
                 new WebExpressionAuthorizationManager(
@@ -65,18 +66,18 @@ public class SecurityConfig {
       }
     });
 
-    // config() 메서드를 작성하는 순간 자동으로 생성되던 login페이지도 선언을해줘야 동작함.
+    // 일반 로그인 관한 설정
     httpSecurity.formLogin(new Customizer<FormLoginConfigurer<HttpSecurity>>() {
       @Override
       public void customize(FormLoginConfigurer<HttpSecurity> httpSecurityFormLoginConfigurer) {
+        // config() 메서드를 작성하는 순간 자동으로 생성되던 login페이지도 선언을해줘야 동작함.
         // 내용은 없어도 기본적으로 /login 페이지로 이동 가능
 
-
-        /*httpSecurityFormLoginConfigurer
+        httpSecurityFormLoginConfigurer
             // 커스텀로그인페이지등록시 컨트롤러와 permitAll()을 지정해줘야 한다.
-            .loginPage("/sample/login") // 커스텀 로그인 페이지 주소
-            .loginProcessingUrl("/loginProc") // 커스텀 로그인 처리 주소
-        ;*/
+            .loginPage("/sample/login") // 커스텀 로그인 페이지 주소, 컨트롤러등록필요
+            .loginProcessingUrl("/loginProc") // 커스텀 로그인 처리 주소,컨트롤러등록불필요
+        ;
 
         // 로그인을 성공했을 때 이동할 페이지 지정
         //httpSecurityFormLoginConfigurer.loginProcessingUrl("/sample/main");
@@ -92,6 +93,18 @@ public class SecurityConfig {
       }
     });
 
+    // social 로그인 관한 설정
+    httpSecurity.oauth2Login(new Customizer<OAuth2LoginConfigurer<HttpSecurity>>(){
+      @Override
+      public void customize(OAuth2LoginConfigurer<HttpSecurity> httpSecurityOAuth2LoginConfigurer) {
+        httpSecurityOAuth2LoginConfigurer
+            //.loginPage("/samplelogin")
+            .successHandler(
+            getAuthenticationSuccessHandler()
+        );
+      }
+    });
+
     httpSecurity.logout(new Customizer<LogoutConfigurer<HttpSecurity>>() {
       @Override
       public void customize(LogoutConfigurer<HttpSecurity> httpSecurityLogoutConfigurer) {
@@ -100,15 +113,7 @@ public class SecurityConfig {
             .logoutSuccessUrl("/")
             .logoutSuccessHandler(getCustomLogoutSuccessHandler())
             .invalidateHttpSession(true)
-            ;
-      }
-    });
-    httpSecurity.oauth2Login(new Customizer<OAuth2LoginConfigurer<HttpSecurity>>() {
-      @Override
-      public void customize(OAuth2LoginConfigurer<HttpSecurity> httpSecurityOAuth2LoginConfigurer) {
-        httpSecurityOAuth2LoginConfigurer.successHandler(
-            getAuthenticationSuccessHandler()
-        );
+        ;
       }
     });
 
@@ -122,7 +127,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationSuccessHandler getAuthenticationSuccessHandler() {
-    return new CustomLoginSuccessHandler();
+    return new CustomLoginSuccessHandler(passwordEncoder());
   }
 
   @Bean
@@ -135,7 +140,7 @@ public class SecurityConfig {
     return new CustomLogoutSuccessHandler();
   }
 
- /* 
+  /*
   // InMemory 방식으로 UserDetailsService(인증 관리 객체) 사용
   @Bean
   public UserDetailsService userDetailsService() {
@@ -160,6 +165,7 @@ public class SecurityConfig {
     list.add(admin);
     return new InMemoryUserDetailsManager(list);
 
-  }*/ // 인메모리 방식 DB와 같이 사용할수 없어서 인메모리는 주석
+  }
+  */
 
 }

@@ -21,7 +21,7 @@ public class SampleController {
   @GetMapping("/manager")
   public void exManager(@AuthenticationPrincipal ClubMemberAuthDTO clubMemberAuthDTO) {
     log.info("/manager....");
-    log.info("ClubMemberAuthDTO: " + clubMemberAuthDTO);
+    log.info("clubMemberAuthDTO: " + clubMemberAuthDTO);
   }
 
   @GetMapping("/admin")

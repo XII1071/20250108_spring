@@ -1,7 +1,6 @@
 package com.example.ex7.repository;
 
 import com.example.ex7.entity.ClubMember;
-import jakarta.persistence.Entity;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
