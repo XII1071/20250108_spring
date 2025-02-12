@@ -88,11 +88,37 @@
     }
 
     @Override
+    @Transactional
     public void modify(MovieDTO movieDTO) {
+      Optional<Movie> result = movieRepository.findById(movieDTO.getMno());
 
+      if (result.isPresent()) {
+        Movie movie = result.get();
+        movie.changeTitle(movieDTO.getTitle()); // 제목 변경
+
+        // ✅ 기존 이미지 삭제 후 새로운 이미지 저장
+        movieImageRepository.deleteByMovieMno(movieDTO.getMno());
+
+        List<MovieImage> newImageList = new ArrayList<>();
+        if (movieDTO.getImageDTOList() != null) {
+          for (MovieImageDTO imgDTO : movieDTO.getImageDTOList()) {
+            MovieImage newImage = MovieImage.builder()
+                .path(imgDTO.getPath())
+                .imgName(imgDTO.getImgName())
+                .uuid(imgDTO.getUuid())
+                .movie(movie)
+                .build();
+            newImageList.add(newImage);
+          }
+          movieImageRepository.saveAll(newImageList);
+        }
+
+        movieRepository.save(movie);
+      }
     }
 
-      @Override
+
+    @Override
       @Transactional
       public void deleteMovie(Long mno) {
         log.info("🔴 deleteMovie 호출됨: mno = " + mno);

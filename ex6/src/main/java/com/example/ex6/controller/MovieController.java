@@ -42,18 +42,15 @@ public class MovieController {
   }
 
   @PostMapping("/modify")
-  public String modify(MovieDTO movieDTO,
-                       PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
-    movieService.modify(movieDTO);
-    ra.addFlashAttribute("msg", movieDTO.getMno() + "번 게시물이 수정");
+  public String modify(MovieDTO movieDTO, RedirectAttributes redirectAttributes) {
+    log.info("Modify Movie: " + movieDTO);
 
-    // ✅ `mno`를 URL 파라미터로 넘겨주기
-    ra.addAttribute("mno", movieDTO.getMno());
-    ra.addAttribute("page", pageRequestDTO.getPage());
-    ra.addAttribute("type", pageRequestDTO.getType());
-    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
-    return "redirect:/movie/read"; // ✅ read로 이동
+    movieService.modify(movieDTO);
+
+    redirectAttributes.addAttribute("mno", movieDTO.getMno());
+    return "redirect:/movie/read";
   }
+
 
   @DeleteMapping("/delete/{mno}")
   public ResponseEntity<String> deleteMovie(@PathVariable("mno") Long mno) {

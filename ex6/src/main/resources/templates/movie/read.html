@@ -57,11 +57,17 @@
             <div class="uploadResult">
                 <ul>
                     <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
-                        th:data-file="${movieImageDTO.getThumbnailURL}" style="cursor:pointer;">
-                        <img th:src="@{|/display?fileName=${movieImageDTO.path}/${movieImageDTO.uuid}_${movieImageDTO.imgName}|}" width="100" height="100">
+                        th:data-path="${movieImageDTO.path}"
+                        th:data-uuid="${movieImageDTO.uuid}"
+                        th:data-file="${movieImageDTO.getImageURL}"
+                        th:data-name="${movieImageDTO.imgName}">
+                        <div>
+                            <img th:src="@{/display(fileName=${movieImageDTO.getImageURL})}" alt="이미지">
+                        </div>
                     </li>
                 </ul>
             </div>
+
         </form>
         <div class="mt-4">
             <span class="btn btn-outline-secondary" onclick="addReview()">Add Review</span>
