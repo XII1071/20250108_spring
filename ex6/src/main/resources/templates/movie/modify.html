@@ -3,73 +3,40 @@
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
     <th:block th:fragment="content">
         <style>
-            .form-group{margin-bottom: 20px;}
-            .uploadResult {width: 100%;background:gray;margin-top:10px;}
+            .form-group { margin-bottom: 20px; }
+            .uploadResult { width: 100%; background: gray; margin-top: 10px; }
             .uploadResult ul {
-                display: flex; flex-flow:row; justify-content:center;
-                align-items;center;vertical-align:top;overflow: auto;
+                display: flex; flex-flow: row; justify-content: center;
+                align-items: center; vertical-align: top; overflow: auto;
             }
-            .uploadResult ul li {list-style:none;padding:10px;margin-left:2em;}
-            .uploadResult ul li img {width: 100px;}
-
-            .star {position: relative;font-size: 2rem;color: #ddd;}
-            .star input {width: 100%;height: 100%;position: absolute;left: 0;
-              opacity: 0;cursor: pointer;}
-            .star span {width: 0;position: absolute; left: 0;color:#ffc83d;
-              overflow: hidden;pointer-events: none; -webkit-text-stroke:2px black;}
+            .uploadResult ul li { list-style: none; padding: 10px; margin-left: 2em; }
+            .uploadResult ul li img { width: 100px; }
         </style>
+
         <h1 class="mt-4">Movie Modify Page</h1>
+
         <form th:action="@{/movie/modify}" th:method="post" id="frmSend">
             <div class="form-group">
                 <label for="mno">Mno</label>
-                <input type="text" name="mno" id="mno" class="form-control" readonly
-                       th:value="${movieDTO.mno}">
+                <input type="text" name="mno" id="mno" class="form-control" readonly th:value="${movieDTO.mno}">
             </div>
             <div class="form-group">
                 <label for="title">Title</label>
-                <input type="text" name="title" id="title" class="form-control"
-                       th:value="${movieDTO.title}">
-            </div>
-            <div class="form-group">
-                <label for="avg">Average</label>
-                <input type="text" name="avg" id="avg" class="form-control"
-                       th:value="${movieDTO.avg}" readonly>
-            </div>
-            <div class="form-group">
-                <label for="reviewCnt">Review Count</label>
-                <input type="text" name="reviewCnt" id="reviewCnt" class="form-control"
-                       th:value="${movieDTO.reviewCnt}" readonly>
-            </div>
-            <div class="form-group">
-                <label for="regDate">RegDate</label>
-                <input type="text" id="regDate" class="form-control" readonly
-                       th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
-            </div>
-            <div class="form-group">
-                <label for="modDate">ModDate</label>
-                <input type="text" id="modDate" class="form-control"readonly
-                       th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+                <input type="text" name="title" id="title" class="form-control" th:value="${movieDTO.title}">
             </div>
             <div class="form-group">
                 <label for="fileInput">Select Image Files</label>
-                <input type="file" id="fileInput" class="custom-file-input form-control files"
-                       multiple></input>
+                <input type="file" id="fileInput" class="custom-file-input form-control files" multiple>
                 <label id="custom-label"></label>
             </div>
             <div class="box"></div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btnModi">Modify</button>
-
-                <button type="button" class="btn btn-danger"
-                        th:if="${movieDTO.mno != null}"
-                        th:onclick="'deleteMovie(' + ${movieDTO.mno} + ')'">Delete</button>
-
-
-                <a th:href="@{/movie/list}">
-                    <button type="button" class="btn btn-info">Back</button>
-                </a>
+                <button type="button" class="btn btn-primary btnModi">Modify</button>
+                <button type="button" class="btn btn-danger btnDele">Delete</button>
+                <button type="button" class="btn btn-info btnBack">Back</button>
             </div>
         </form>
+
         <div class="uploadResult">
             <ul>
                 <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
@@ -84,155 +51,90 @@
                 </li>
             </ul>
         </div>
+
+        <!-- 모달 -->
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">삭제 확인</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        삭제가 완료되었습니다.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                     </div>
                 </div>
             </div>
         </div>
+
         <script th:inline="javascript">
-            const mno = [[${movieDTO.mno}]];
+            document.addEventListener("DOMContentLoaded", function () {
+                const mno = [[${movieDTO.mno}]];
+                const btnModi = document.querySelector(".btnModi");
+                const btnDele = document.querySelector(".btnDele");
+                const btnBack = document.querySelector(".btnBack");
+                const frmSend = document.querySelector("#frmSend");
 
-            function checkExtension(fileName, fileSize) {
-                const maxSize = 1024 * 1024 * 10; // 10MB 제한
-                const regex = new RegExp("(.*?)\\.(jpg|jpeg|png|gif|bmp|pdf)$", 'i');
-                if (fileSize >= maxSize) {
-                    alert("파일 사이즈 초과");
-                    return false;
-                }
-                if (!regex.test(fileName)) {
-                    alert("해당파일 업로드 금지!");
-                    return false;
-                }
-                return true;
-            }
-
-            function attachRemoveEvent() {
-                const removeBtns = document.querySelectorAll(".removeBtn");
-                removeBtns.forEach(button => {
-                    button.onclick = function () {
-                        const targetLi = this.closest('li');
-                        const fileName = targetLi.dataset.file;
-                        const uuid = targetLi.dataset.uuid;
-                        const removeUrl = /*[[@{/removeFile}]]*/ '/removeFile';
-                        const formData = new FormData();
-                        formData.append("fileName", fileName);
-                        formData.append("uuid", uuid);
-                        fetch(removeUrl, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(json => {
-                            if (json === true) {
-                                targetLi.remove();
-                                console.log("이미지 삭제 성공!");
-                            } else {
-                                console.log("이미지 삭제 실패");
-                            }
-                        })
-                        .catch(err => console.log("에러 발생:", err));
-                    };
-                });
-            }
-
-            function showResult(arr) {
-                const uploadResultUl = document.querySelector(".uploadResult ul");
-                const displayUrl = /*[[@{/display}]]*/ '/display';
-                let str = "";
-                arr.forEach(image => {
-                    str += `
-                        <li data-name="${image.fileName}" data-path="${image.folderPath}" data-uuid="${image.uuid}" data-file="${image.imageURL}">
-                            <div>
-                                <button type="button" class="removeBtn">X</button>
-                                <img src="${displayUrl}?fileName=${image.thumbnailURL}" alt="이미지">
-                            </div>
-                        </li>
-                    `;
-                });
-                uploadResultUl.insertAdjacentHTML('beforeend', str);
-                attachRemoveEvent();
-            }
-
-            document.querySelector("#fileInput").onchange = function() {
-                let formData = new FormData();
-                let files = this.files;
-                for (let i = 0; i < files.length; i++) {
-                    if (!checkExtension(files[i].name, files[i].size)) {
-                        this.value = '';
+                // ✅ Modify 버튼
+                btnModi.onclick = function (e) {
+                    e.preventDefault();
+                    if (document.querySelector("#title").value.trim() === "") {
+                        alert("제목을 입력하세요.");
                         return;
                     }
-                    formData.append("uploadFiles", files[i]);
-                }
-                const uploadUrl = /*[[@{/uploadAjax}]]*/ '/uploadAjax';
-                fetch(uploadUrl, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(json => {
-                    showResult(json);
-                })
-                .catch(err => console.log("에러 발생:", err));
-            };
 
-            document.querySelector(".btnModi").onclick = function(e) {
-                e.preventDefault();
-                const title = document.querySelector("#title");
-                if (title.value.trim() === "") {
-                    title.focus();
-                    return false;
-                }
-                let hiddenInputs = "";
-                const liArr = document.querySelectorAll(".uploadResult ul li");
-                liArr.forEach((li, index) => {
-                    hiddenInputs += `
-                        <input type="hidden" name="imageDTOList[${index}].imgName" value="${li.dataset.name}">
-                        <input type="hidden" name="imageDTOList[${index}].path" value="${li.dataset.path}">
-                        <input type="hidden" name="imageDTOList[${index}].uuid" value="${li.dataset.uuid}">
-                    `;
-                });
-                document.querySelector(".box").innerHTML = hiddenInputs;
-                document.querySelector("#frmSend").submit();
-            };
+                    let hiddenInputs = "";
+                    const liArr = document.querySelectorAll(".uploadResult ul li");
+                    liArr.forEach((li, index) => {
+                        hiddenInputs += `
+                            <input type="hidden" name="imageDTOList[${index}].imgName" value="${li.dataset.name}">
+                            <input type="hidden" name="imageDTOList[${index}].path" value="${li.dataset.path}">
+                            <input type="hidden" name="imageDTOList[${index}].uuid" value="${li.dataset.uuid}">
+                        `;
+                    });
 
-            attachRemoveEvent();
+                    document.querySelector(".box").innerHTML = hiddenInputs;
+                    frmSend.submit();
+                };
 
-            function deleteMovie(mno) {
-            const url = `/ex6/movie/delete/${mno}`;
-            fetch(url, { method: 'DELETE' })
-                .then(response => {
-                    if (response.ok) {
-                        const modalTitle = document.querySelector('#exampleModalLabel');
-                        const modalBody = document.querySelector('.modal-body');
+                // ✅ Delete 버튼
+                btnDele.onclick = function (e) {
+                    e.preventDefault();
 
-                        modalTitle.textContent = `삭제창`;
-                        modalBody.innerHTML = `<p>${mno}번이 삭제되었습니다.</p>`;
-
-                        const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: 'static' });
-                        myModal.show();
-
-                        setTimeout(() => {
-                            window.location.href = '/ex6/movie/list';
-                        }, 1000);
-                    } else {
-                        alert("영화 삭제에 실패했습니다.");
+                    if (!confirm("정말로 삭제하시겠습니까?")) {
+                        return;
                     }
-                })
-                .catch(error => console.log("Error occurred:", error));
-            }
+
+                    fetch(`/movie/delete/${mno}`, { method: 'DELETE' })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("삭제 요청 실패");
+                            }
+                            return response.text();
+                        })
+                        .then(() => {
+                            const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: 'static' });
+                            myModal.show();
+                            setTimeout(() => {
+                                window.location.href = '/movie/list';
+                            }, 1000);
+                        })
+                        .catch(error => {
+                            console.error("삭제 중 오류 발생:", error);
+                            alert("삭제 중 오류가 발생했습니다.");
+                        });
+                };
+
+                // ✅ Back 버튼
+                btnBack.onclick = function (e) {
+                    e.preventDefault();
+                    window.history.back();
+                };
+            });
         </script>
     </th:block>
 </th:block>
-
 </html>
