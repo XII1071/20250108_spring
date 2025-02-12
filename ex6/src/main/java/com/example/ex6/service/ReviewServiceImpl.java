@@ -4,6 +4,7 @@ import com.example.ex6.dto.ReviewDTO;
 import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.Review;
 import com.example.ex6.repository.ReviewRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -49,5 +50,12 @@ public class ReviewServiceImpl implements ReviewService {
   @Override
   public void remove(Long reviewnum) {
     reviewRepository.deleteById(reviewnum);
+  }
+  @Override
+  @Transactional
+  public void deleteReviewsByMovie(Long mno) {
+    log.info("🔴 해당 영화의 리뷰 삭제: mno = {}", mno);
+    reviewRepository.deleteByMovieMno(mno);
+    log.info("✅ 리뷰 삭제 완료");
   }
 }

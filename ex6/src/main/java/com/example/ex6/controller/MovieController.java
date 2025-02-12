@@ -3,6 +3,7 @@ package com.example.ex6.controller;
 import com.example.ex6.dto.MovieDTO;
 import com.example.ex6.dto.PageRequestDTO;
 import com.example.ex6.service.MovieService;
+import com.example.ex6.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class MovieController {
   private final MovieService movieService;
+  private final ReviewService reviewService;
 
   @GetMapping({"", "/", "/list"})
   public String list(PageRequestDTO pageRequestDTO, Model model) {
@@ -54,22 +56,22 @@ public class MovieController {
 
   @DeleteMapping("/delete/{mno}")
   public ResponseEntity<String> deleteMovie(@PathVariable("mno") Long mno) {
-    log.info("🔴 영화 삭제 요청: " + mno);
     try {
+      log.info("🎬 영화 삭제 요청: mno = {}", mno);
+
+      // 1️⃣ 관련된 리뷰 삭제
+      reviewService.deleteReviewsByMovie(mno);
+      log.info("✅ 관련된 리뷰 삭제 완료");
+
+      // 2️⃣ 영화 삭제
       movieService.deleteMovie(mno);
-      return ResponseEntity.ok("✅ 삭제 성공: " + mno);
+      log.info("✅ 영화 삭제 완료: mno = {}", mno);
+
+      return ResponseEntity.ok("영화 삭제 완료");
     } catch (Exception e) {
-      log.error("❌ 삭제 실패: ", e);
-      return ResponseEntity.status(500).body("❌ 삭제 실패: " + e.getMessage());
+      log.error("❌ 영화 삭제 중 오류 발생: ", e);
+      return ResponseEntity.internalServerError().body("영화 삭제 실패");
     }
   }
 
 }
-
-
-
-
-
-
-
-

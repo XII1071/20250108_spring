@@ -29,4 +29,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Modifying
     @Query("delete from Review r where r.movie.mno = :mno ")
     void deleteByMno(@Param("mno") Long mno);
+
+    @Modifying
+    @Query("DELETE FROM Review r WHERE r.movie.mno = :mno")
+    void deleteByMovieMno(@Param("mno") Long mno);
 }
