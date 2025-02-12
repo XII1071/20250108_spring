@@ -26,4 +26,7 @@ public class SampleController {
 
   @GetMapping("/admin")
   public void exAdmin() {log.info("/admin....");}
+
+  @GetMapping("/modify")
+  public void exModify() {log.info("/modify....");}
 }

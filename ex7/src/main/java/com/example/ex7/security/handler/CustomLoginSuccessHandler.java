@@ -33,8 +33,16 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
                                       HttpServletResponse response,
                                       Authentication authentication)
       throws IOException, ServletException {
+
     log.info("onAuthenticationSuccess -------------------------------");
     ClubMemberAuthDTO clubMemberAuthDTO = (ClubMemberAuthDTO) authentication.getPrincipal();
+    // social로 첫 로그인한 경우, 회원정보를 간단히 수정창으로 이동하기 위함.
+    if (clubMemberAuthDTO.isFromSocial()
+        && passwordEncoder.matches("1", clubMemberAuthDTO.getPassword())) {
+      redirectStrategy.sendRedirect(request, response, "/sample/modify");
+      return;
+    }
+
     Collection<GrantedAuthority> authors =
         (Collection<GrantedAuthority>) clubMemberAuthDTO.getAuthorities();
     List<String> result = authors.stream().map(new Function<GrantedAuthority, String>() {

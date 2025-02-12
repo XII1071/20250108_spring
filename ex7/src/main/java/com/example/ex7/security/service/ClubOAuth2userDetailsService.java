@@ -51,6 +51,7 @@ public class ClubOAuth2userDetailsService extends DefaultOAuth2UserService {
       email = oAuth2User.getAttribute("email");
     log.info("Email: " + email);
     ClubMember clubMember = saveSocialMember(email);
+    log.info("clubMember: " + clubMember);
     ClubMemberAuthDTO clubMemberAuthDTO = new ClubMemberAuthDTO(
         clubMember.getEmail(),
         clubMember.getPassword(),

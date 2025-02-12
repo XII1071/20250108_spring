@@ -55,6 +55,7 @@ public class SecurityConfig {
         auth.requestMatchers(AUTH_WHITELIST).permitAll()  //모두 수용 복수 지정때는 String배열로 적용
             .requestMatchers("/sample/all/**").permitAll()//모두 수용 단독 지정때는 주소와 "**" 덧붙임.
             .requestMatchers("/sample/login/**").permitAll()//커스텀 로그인 사용시 모두 허용
+            .requestMatchers("/sample/modify/**").hasRole("USER")//커스텀 로그인 사용시 모두 허용
             .requestMatchers("/sample/manager/**").hasRole("MANAGER")//커스텀 로그인 사용시 모두 허용
             .requestMatchers("/sample/admin").hasRole("ADMIN") //권한이 단수일 때
             .requestMatchers("/sample/manager").access(  //권한이 복수일 때
@@ -87,7 +88,7 @@ public class SecurityConfig {
         //httpSecurityFormLoginConfigurer.failureForwardUrl("/")
 
         // 로그인 성공 또는 실패할 때 상황별 이동을 정의하려고 할 때
-        //httpSecurityFormLoginConfigurer.successHandler(getAuthenticationSuccessHandler());
+        httpSecurityFormLoginConfigurer.successHandler(getAuthenticationSuccessHandler());
         //httpSecurityFormLoginConfigurer.failureHandler(getAuthenticationFailureHandler());
 
       }
@@ -99,9 +100,8 @@ public class SecurityConfig {
       public void customize(OAuth2LoginConfigurer<HttpSecurity> httpSecurityOAuth2LoginConfigurer) {
         httpSecurityOAuth2LoginConfigurer
             //.loginPage("/samplelogin")
-            .successHandler(
-            getAuthenticationSuccessHandler()
-        );
+            .successHandler(getAuthenticationSuccessHandler())
+        ;
       }
     });
 

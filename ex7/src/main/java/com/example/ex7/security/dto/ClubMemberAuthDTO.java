@@ -17,6 +17,7 @@ public class ClubMemberAuthDTO extends User implements OAuth2User {
   private String email;
   private String name;
   private boolean fromSocial;
+  private String password;
   private Map<String, Object> attr; //소셜로부터 받은 정보를 저장하는 속성
 
   public ClubMemberAuthDTO(String username, String password,
@@ -24,6 +25,7 @@ public class ClubMemberAuthDTO extends User implements OAuth2User {
                            String name, boolean fromSocial) {
     super(username, password, authorities);
     this.email = email;
+    this.password = password;
     this.name = name;
     this.fromSocial = fromSocial;
   }
