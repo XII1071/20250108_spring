@@ -1,20 +1,21 @@
 package com.example.ex7.config;
 
+import com.example.ex7.security.handler.CustomAccessDeniedHandler;
 import com.example.ex7.security.handler.CustomAuthenticationFailureHandler;
 import com.example.ex7.security.handler.CustomLoginSuccessHandler;
 import com.example.ex7.security.handler.CustomLogoutSuccessHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2ClientConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,9 +23,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.util.ArrayList;
@@ -35,7 +38,7 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
-      "/"
+      "/", "/auth/accessDenied", "/auth/authenticationFailure"
   };
 
   // spring security의 세션방식 기반으로 대부분의 설정 가능
@@ -89,7 +92,7 @@ public class SecurityConfig {
 
         // 로그인 성공 또는 실패할 때 상황별 이동을 정의하려고 할 때
         httpSecurityFormLoginConfigurer.successHandler(getAuthenticationSuccessHandler());
-        //httpSecurityFormLoginConfigurer.failureHandler(getAuthenticationFailureHandler());
+        httpSecurityFormLoginConfigurer.failureHandler(getAuthenticationFailureHandler());
 
       }
     });
@@ -117,6 +120,41 @@ public class SecurityConfig {
       }
     });
 
+    httpSecurity.rememberMe(new Customizer<RememberMeConfigurer<HttpSecurity>>() {
+      @Override
+      public void customize(RememberMeConfigurer<HttpSecurity> httpSecurityRememberMeConfigurer) {
+        httpSecurityRememberMeConfigurer.tokenValiditySeconds(60 * 60 * 24 * 7);
+        /*
+        httpSecurityRememberMeConfigurer.rememberMeServices(new RememberMeServices() {
+
+          @Override
+          public Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
+            return null;
+          }
+
+          @Override
+          public void loginFail(HttpServletRequest request, HttpServletResponse response) {
+
+          }
+
+          @Override
+          public void loginSuccess(HttpServletRequest request, HttpServletResponse response, Authentication successfulAuthentication) {
+
+          }
+        });*/
+      }
+    });
+
+    httpSecurity.exceptionHandling(new Customizer<ExceptionHandlingConfigurer<HttpSecurity>>() {
+      @Override
+      public void customize(ExceptionHandlingConfigurer<HttpSecurity> httpSecurityExceptionHandlingConfigurer) {
+        httpSecurityExceptionHandlingConfigurer
+            .accessDeniedHandler(getAccessDeniedHandler())
+            //.accessDeniedPage("")
+        ;
+      }
+    });
+
     return httpSecurity.build();  //SecurityFilterChain 타입의 프록시 객체가 리턴
   }
 
@@ -138,6 +176,11 @@ public class SecurityConfig {
   @Bean
   public LogoutSuccessHandler getCustomLogoutSuccessHandler() {
     return new CustomLogoutSuccessHandler();
+  }
+
+  @Bean
+  public AccessDeniedHandler getAccessDeniedHandler() {
+    return new CustomAccessDeniedHandler();
   }
 
   /*
