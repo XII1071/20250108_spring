@@ -5,11 +5,11 @@ import com.example.ex6.dto.PageRequestDTO;
 import com.example.ex6.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -55,8 +55,24 @@ public class MovieController {
     return "redirect:/movie/read"; // ✅ read로 이동
   }
 
+  @DeleteMapping("/delete/{mno}")
+  public ResponseEntity<String> deleteMovie(@PathVariable("mno") Long mno) {
+    log.info("🔴 영화 삭제 요청: " + mno);
+    try {
+      movieService.deleteMovie(mno);
+      return ResponseEntity.ok("✅ 삭제 성공: " + mno);
+    } catch (Exception e) {
+      log.error("❌ 삭제 실패: ", e);
+      return ResponseEntity.status(500).body("❌ 삭제 실패: " + e.getMessage());
+    }
+  }
 
 }
+
+
+
+
+
 
 
 

@@ -27,6 +27,8 @@ public interface MovieService {
 
     void modify(MovieDTO movieDTO);
 
+    void deleteMovie(Long mno);
+
     void removeMovieImagebyUUID(String uuid);
 
     default Map<String, Object> dtoToEntity(MovieDTO movieDTO) {
