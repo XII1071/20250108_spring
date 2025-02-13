@@ -2,6 +2,7 @@ package com.example.ex8.config;
 
 import com.example.ex8.security.filter.ApiCheckFilter;
 import com.example.ex8.security.filter.ApiLoginFilter;
+import com.example.ex8.security.handler.ApiLoginFailHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -37,7 +38,7 @@ public class SecurityConfig {
 
     httpSecurity.addFilterBefore(
         apiCheckFilter(),
-        UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter 호출
+        UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter호출
     );
 
     httpSecurity.addFilterBefore(
@@ -60,12 +61,13 @@ public class SecurityConfig {
 
   @Bean
   public ApiLoginFilter apiLoginFilter(
-      // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService 호출)
+      // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
     ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
     apiLoginFilter.setAuthenticationManager(
         authenticationConfiguration.getAuthenticationManager()
     );
+    apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
     return apiLoginFilter;
   }
 
