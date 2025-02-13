@@ -1,8 +1,10 @@
 package com.example.ex8.config;
 
 import com.example.ex8.security.filter.ApiCheckFilter;
+import com.example.ex8.security.filter.ApiLoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,10 +35,14 @@ public class SecurityConfig {
             .anyRequest().denyAll()
     );
 
-    // 지정하려는 filter가 어느 필터 앞에서 진행되는지를 지정
-    httpSecurity.addFilterBefore(apiCheckFilter(),
-//        BasicAuthenticationFilter.class
-        UsernamePasswordAuthenticationFilter.class //아이디와 비번기반으로 동작하는 필터
+    httpSecurity.addFilterBefore(
+        apiCheckFilter(),
+        UsernamePasswordAuthenticationFilter.class //아이디,비번 기반 필터 실행 전 apiCheckFilter 호출
+    );
+
+    httpSecurity.addFilterBefore(
+        apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+        UsernamePasswordAuthenticationFilter.class
     );
 
     return httpSecurity.build();
@@ -50,6 +56,17 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(new String[]{"/notes/**"});
+  }
+
+  @Bean
+  public ApiLoginFilter apiLoginFilter(
+      // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService 호출)
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
+    apiLoginFilter.setAuthenticationManager(
+        authenticationConfiguration.getAuthenticationManager()
+    );
+    return apiLoginFilter;
   }
 
 }

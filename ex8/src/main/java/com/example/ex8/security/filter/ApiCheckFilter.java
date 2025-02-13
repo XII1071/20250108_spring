@@ -5,7 +5,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,8 +28,6 @@ public class ApiCheckFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     log.info("ApiCheckFilter................................");
-    log.info("ApiCheckFilter................................");
-    log.info("ApiCheckFilter................................");
     log.info("REQUEST URI: " + request.getRequestURI());
 
     boolean check = false;
@@ -46,5 +46,17 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     }
     filterChain.doFilter(request, response);
 
+  }
+
+  private boolean checkAuthHeader(HttpServletRequest request) {
+    boolean chkResult = false;
+    String authHeader = request.getHeader("Authorization");
+    if (StringUtils.hasText(authHeader)) {
+      log.info("Authorization exist: " + authHeader);
+      if (authHeader.equals("12345678")) {
+        chkResult = true;
+      }
+    }
+    return  chkResult;
   }
 }
