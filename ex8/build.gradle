@@ -51,7 +51,21 @@ dependencies {
 	// https://mvnrepository.com/artifact/net.coobird/thumbnailator
 	implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
 
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
+
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
+
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
+
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-gson
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-gson', version: '0.12.6'
+
+
+
+
 }
 
 // when gradle clean, delete QClass directory automatically.

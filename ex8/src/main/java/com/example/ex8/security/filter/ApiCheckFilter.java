@@ -1,5 +1,6 @@
 package com.example.ex8.security.filter;
 
+import com.example.ex8.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,15 +22,17 @@ public class ApiCheckFilter extends OncePerRequestFilter {
 
   private String[] pattern;
   private AntPathMatcher antPathMatcher;
+  private JWTUtil jwtUtil;
 
-  public ApiCheckFilter(String[] pattern) {
+  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil) {
     this.pattern = pattern;
+    this.jwtUtil = jwtUtil;
     antPathMatcher = new AntPathMatcher();
   }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    // client 요청 주소와 패턴을 비교후 같으면 header에 Authorization에 값이 있는지 확인하는 메서드
+    // client요청 주소와 패턴이 같은지 비교후 같으면 header에 Authorization에 값이 있는지 확인하는 메서드
     log.info("ApiCheckFilter................................");
     log.info("REQUEST URI: " + request.getRequestURI());
 
@@ -40,9 +43,9 @@ public class ApiCheckFilter extends OncePerRequestFilter {
         break;
       }
     }
-    if (check) { // 요청주소와 패턴이 일치한 경우
+    if (check) {  // 요청주소와 패턴이 일치한 경우
       log.info("check:" + check);
-      if (checkAuthHeader(request)) { // header에 Authorization 값이 있는 경우
+      if (checkAuthHeader(request)) { // header에 Authorization값이 있는 경우
         filterChain.doFilter(request, response);
         return;
       } else {
@@ -57,17 +60,21 @@ public class ApiCheckFilter extends OncePerRequestFilter {
       }
     }
     filterChain.doFilter(request, response);
-
   }
 
   private boolean checkAuthHeader(HttpServletRequest request) {
     boolean chkResult = false;
     String authHeader = request.getHeader("Authorization");
-    if (StringUtils.hasText(authHeader)) {
+
+    // Authorization 헤더는 일반적으로 Basic으로 시작, JWT으로 시작할 경우 Bearer 사용
+    if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
       log.info("Authorization exist: " + authHeader);
-      if (authHeader.equals("12345678")) {
-        chkResult = true;
-      }
+      // if (authHeader.equals("12345678")) chkResult = true;
+      try {
+        String email = jwtUtil.validateAndExtract(authHeader.substring(7));
+        log.info("Validate result: " + email);
+        chkResult = email.length() > 0;
+      } catch (Exception e) {e.printStackTrace();}
     }
     return chkResult;
   }

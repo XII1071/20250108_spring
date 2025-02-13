@@ -3,6 +3,7 @@ package com.example.ex8.config;
 import com.example.ex8.security.filter.ApiCheckFilter;
 import com.example.ex8.security.filter.ApiLoginFilter;
 import com.example.ex8.security.handler.ApiLoginFailHandler;
+import com.example.ex8.security.util.JWTUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -56,21 +57,33 @@ public class SecurityConfig {
 
   @Bean
   public ApiCheckFilter apiCheckFilter() {
-    return new ApiCheckFilter(new String[]{"/notes/**"});
+    return new ApiCheckFilter(new String[]{"/notes/**"}, jwtUtil());
   }
 
   @Bean
   public ApiLoginFilter apiLoginFilter(
       // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login", jwtUtil());
+
     apiLoginFilter.setAuthenticationManager(
         authenticationConfiguration.getAuthenticationManager()
     );
-    apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
+    apiLoginFilter.setAuthenticationFailureHandler(
+        getApiLoginFailHandler()
+    );
     return apiLoginFilter;
   }
 
+  @Bean
+  public ApiLoginFailHandler getApiLoginFailHandler() {
+    return new ApiLoginFailHandler();
+  }
+
+  @Bean
+  public JWTUtil jwtUtil() {
+    return new JWTUtil();
+  }
 }
 
 

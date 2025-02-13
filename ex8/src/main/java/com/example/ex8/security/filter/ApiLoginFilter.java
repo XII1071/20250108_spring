@@ -1,5 +1,8 @@
 package com.example.ex8.security.filter;
 
+import com.example.ex8.security.dto.ClubMemberAuthDTO;
+import com.example.ex8.security.util.JWTUtil;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,8 +17,11 @@ import java.io.IOException;
 
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
-  public ApiLoginFilter(String defaultFilterProcessesUrl) {
+  private JWTUtil jwtUtil;
+
+  public ApiLoginFilter(String defaultFilterProcessesUrl, JWTUtil jwtUtil) {
     super(defaultFilterProcessesUrl);
+    this.jwtUtil = jwtUtil;
   }
 
   @Override
@@ -26,8 +32,23 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     if (email == null) {
       throw new BadCredentialsException("email cannot be null");
     }
+    // authToken:: UserDetailsService 를 통해서 DB에 email, pass를 검증한 결과를 리턴
     UsernamePasswordAuthenticationToken authToken =
         new UsernamePasswordAuthenticationToken(email, pass);
     return getAuthenticationManager().authenticate(authToken);
+  }
+
+  @Override
+  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    log.info("ApiLoginFilter:: successfulAuthentication : " + authResult);
+    log.info(authResult.getPrincipal());
+    String email = ((ClubMemberAuthDTO) authResult.getPrincipal()).getEmail();
+    String token = null;
+    try {
+      token = jwtUtil.generateToken(email);
+      response.setContentType("text/plain");
+      response.getOutputStream().write(token.getBytes()); // token 발행
+      log.info("generated token: " + token);
+    } catch (Exception e) {e.printStackTrace();}
   }
 }
