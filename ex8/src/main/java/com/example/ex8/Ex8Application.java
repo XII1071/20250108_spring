@@ -10,7 +10,7 @@ public class Ex8Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Ex8Application.class, args);
-		System.out.println("Started....");
+		System.out.println("Started...");
 	}
 
 }

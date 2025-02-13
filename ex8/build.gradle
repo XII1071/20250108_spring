@@ -64,8 +64,6 @@ dependencies {
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-gson', version: '0.12.6'
 
 
-
-
 }
 
 // when gradle clean, delete QClass directory automatically.

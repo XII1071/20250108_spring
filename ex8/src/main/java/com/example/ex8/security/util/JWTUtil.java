@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Log4j2
-// 스프링 환경이 아닌 곳에서 사용할 수 있도록 발행할 수 있는 유틸리티
+// 스프링 환경이 아닌 곳에서 사용할 수 있도록 토큰을 발행할 수 있는 유틸리티
 public class JWTUtil {
   private String secretKey = "1234567890abcdefghijklmnopqrstuvwxyz";
   private long expire = 60 * 24 * 30;
