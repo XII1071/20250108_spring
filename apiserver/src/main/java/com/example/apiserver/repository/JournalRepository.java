@@ -19,7 +19,7 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
       "from Journal j " +
       "left outer join Photos p   on p.journal = j " +
       "left outer join Comments c on c.journal = j where j.members.mid = :mid group by j ")
-  Page<Object[]> getListPageImg(Pageable pageable, @Param("mid") Long mid);
+  Page<Object[]> getListPagePhotos(Pageable pageable, @Param("mid") Long mid);
 
   @Query(value = "select j.jno, p.pno, p.photos_name, " +
       "avg(coalesce(c.likes, 0)), count(c.cno) " +
@@ -29,7 +29,7 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
       "(select max(pno) from db7.photos p2 where p2.journal_jno=j.jno) " +
       "and j.members_mid = :mid " +
       "group by j.jno ", nativeQuery = true)
-  Page<Object[]> getListPageImgNative(Pageable pageable, @Param("mid") Long mid);
+  Page<Object[]> getListPagePhotosNative(Pageable pageable, @Param("mid") Long mid);
 
   @Query("select j, p, avg(coalesce(c.likes, 0)), count(distinct c) from Journal j " +
       "left outer join Photos p   on p.journal = j " +
@@ -37,7 +37,7 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
       "where pno = (select max(p2.pno) from Photos p2 where p2.journal=j) " +
       "and j.members.mid = :mid " +
       "group by j ")
-  Page<Object[]> getListPageImgJPQL(Pageable pageable, @Param("mid") Long mid);
+  Page<Object[]> getListPagePhotosJPQL(Pageable pageable, @Param("mid") Long mid);
 
   @Query("select journal, max(p.pno) from Photos p group by journal")
   Page<Object[]> getMaxQuery(Pageable pageable);

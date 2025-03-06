@@ -9,30 +9,28 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class CommentsRepositoryTests {
   @Autowired
-  JournalRepository journalRepository;
+  CommentsRepository commentsRepository;
 
   @Autowired
-  MembersRepository memberRepository;
+  MembersRepository membersRepository;
 
   @Test
   public void insertJournalComments() {
     IntStream.rangeClosed(1, 200).forEach(i -> {
-      Long jno = (long) (Math.random() * 100) + 1;
       Long mid = (long) (Math.random() * 100) + 1;
+      Long jno = (long) (Math.random() * 100) + 1;
 
-    Comments comments = Comments.builder()
-        .journal(Journal.builder().jno(jno).build())
-        .members(Members.builder().build())
-        .movie(Movie.builder().mno(mno).build())
-        .grade((int)(Math.random()*5)+1)
-        .text("이 영화에 대하여..."+i)
-        .build();
-    reviewRepository.save(review);
-  });
+      Comments comments = Comments.builder()
+          .journal(Journal.builder().jno(jno).build())
+          .members(Members.builder().mid(mid).build())
+          .likes((int) (Math.random() * 5) + 1)
+          .text("이 글에 대하여..." + i)
+          .build();
+      commentsRepository.save(comments);
+    });
+  }
 
 }
