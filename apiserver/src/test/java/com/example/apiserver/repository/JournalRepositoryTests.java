@@ -10,9 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.test.annotation.Commit;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -63,6 +65,32 @@ class JournalRepositoryTests {
     PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "jno"));
     Page<Object[]> result = journalRepository.getListPagePhotos(pageRequest, 1L);
     for (Object[] objects : result.getContent()) {
+      System.out.println(Arrays.toString(objects));
+    }
+  }
+
+  @Test
+  public void testGetListPagePhotosJPQL() {
+    PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "jno"));
+    Page<Object[]> result = journalRepository.getListPagePhotosJPQL(pageRequest, 1L);
+    for (Object[] objects : result.getContent()) {
+      System.out.println(Arrays.toString(objects));
+    }
+  }
+
+  @Test
+  public void testGetMaxQuery() {
+    PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "pno"));
+    Page<Object[]> result = journalRepository.getMaxQuery(pageRequest);
+    for (Object[] objects : result.getContent()) {
+      System.out.println(Arrays.toString(objects));
+    }
+  }
+
+  @Test
+  public void testGetJournalWithAll() {
+    List<Object[]> result = journalRepository.getJournalWithAll(1L);
+    for (Object[] objects : result) {
       System.out.println(Arrays.toString(objects));
     }
   }
