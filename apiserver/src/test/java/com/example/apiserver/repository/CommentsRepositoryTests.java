@@ -3,10 +3,13 @@ package com.example.apiserver.repository;
 import com.example.apiserver.entity.Comments;
 import com.example.apiserver.entity.Journal;
 import com.example.apiserver.entity.Members;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 @SpringBootTest
@@ -33,4 +36,23 @@ class CommentsRepositoryTests {
     });
   }
 
+  @Test
+  public void testGetJournalComments() {
+    List<Comments> result = commentsRepository.findByJournal(Journal.builder().jno(1L).build());
+    result.forEach(c -> {
+      System.out.println(c.getCno());
+      System.out.println(c.getText());
+      System.out.println(c.getLikes());
+      System.out.println(c.getMembers().getEmail());
+      System.out.println("=".repeat(30));
+    });
+  }
+
+  @Transactional
+  @Commit
+  @Test
+  public void testDeleteMembers() {
+//    commentsRepository.deleteByMembers(Members.builder().mid(2L).build());
+    membersRepository.deleteById(2L);
+  }
 }

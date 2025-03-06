@@ -46,5 +46,5 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
       "from Journal j left outer join Photos p on p.journal=j " +
       "left outer join Comments c on c.journal = j " +
       "where j.jno = :jno group by p ")
-  List<Object[]> getJournalWithAll(@Param("jno") Long jno); //특정 영화 조회
+  List<Object[]> getJournalWithAll(@Param("jno") Long jno);
 }
