@@ -29,7 +29,7 @@ class CommentsRepositoryTests {
       Comments comments = Comments.builder()
           .journal(Journal.builder().jno(jno).build())
           .members(Members.builder().mid(mid).build())
-          .likes((long) (Math.random() * 5) + 1)
+          .likes((int)(Math.random() * 5) + 1)
           .text("이 글에 대하여..." + i)
           .build();
       commentsRepository.save(comments);

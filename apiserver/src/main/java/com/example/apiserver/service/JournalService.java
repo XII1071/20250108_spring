@@ -49,7 +49,7 @@ public interface JournalService {
   }
 
   default JournalDTO entityToDTO(Journal journal, List<Photos> photosList,
-                               Long likes, Long commentsCnt) {
+                               int likes, Long commentsCnt) {
     JournalDTO journalDTO = JournalDTO.builder()
         .jno(journal.getJno())
         .title(journal.getTitle())

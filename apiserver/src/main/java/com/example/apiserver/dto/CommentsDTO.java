@@ -17,7 +17,7 @@ public class CommentsDTO {
   private Long mid;
   private String nickname;
   private String email;
-  private Long likes;
+  private int likes;
   private String text;
   private LocalDateTime regDate, modDate;
 }

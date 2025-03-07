@@ -22,7 +22,7 @@ public class JournalDTO {
   @Builder.Default  //@AllArgsConstructor없으면 에러발생
   private List<PhotosDTO> photosDTOList = new ArrayList<>();
 
-  private Long likes;
+  private int likes;
   private Long commentsCnt;
   private LocalDateTime regDate;
   private LocalDateTime modDate;

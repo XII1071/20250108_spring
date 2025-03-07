@@ -47,7 +47,7 @@ public class JournalServiceImpl implements JournalService {
         return JournalServiceImpl.this.entityToDTO(
             (Journal) objects[0],
             (List<Photos>) (Arrays.asList((Photos) objects[1])),
-            (Long) objects[2],
+            (int) objects[2],
             (Long) objects[3]
         );
       }
@@ -83,7 +83,7 @@ public class JournalServiceImpl implements JournalService {
       }
     });
 
-    Long likes = (Long) result.get(0)[2];
+    int likes = (int) result.get(0)[2];
     Long commentsCnt = (Long) result.get(0)[3];
 
     return entityToDTO(journal, photosList, likes, commentsCnt);
