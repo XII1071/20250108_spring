@@ -14,11 +14,11 @@ import java.net.URLEncoder;
 @NoArgsConstructor
 public class PhotosDTO {
   private String uuid;
-  private String imgName;
+  private String photosName;
   private String path;
-  public String getImageURL() {
+  public String getPhotosURL() {
     try {
-      return URLEncoder.encode(path + "/" + uuid + "_" + imgName, "UTF-8");
+      return URLEncoder.encode(path + "/" + uuid + "_" + photosName, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
@@ -26,7 +26,7 @@ public class PhotosDTO {
   }
   public String getThumbnailURL() {
     try {
-      return URLEncoder.encode(path + "/s_" + uuid + "_" + imgName, "UTF-8");
+      return URLEncoder.encode(path + "/s_" + uuid + "_" + photosName, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }

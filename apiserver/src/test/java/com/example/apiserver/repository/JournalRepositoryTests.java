@@ -43,7 +43,7 @@ class JournalRepositoryTests {
         Photos photos = Photos.builder()
             .uuid(UUID.randomUUID().toString())
             .journal(journal)
-            .photosName("photo" + j + ".jpg")
+            .photosName("photos" + j + ".jpg")
             .build();
         photosRepository.save(photos);
       }

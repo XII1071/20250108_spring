@@ -1,6 +1,7 @@
 package com.example.apiserver.repository;
 
 import com.example.apiserver.entity.Journal;
+import com.example.apiserver.repository.search.SearchJournalRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface JournalRepository extends JpaRepository<Journal, Long> {
+public interface JournalRepository extends JpaRepository<Journal, Long>, SearchJournalRepository {
   @Query("select j, avg(coalesce(c.likes,0)), count(distinct c) " +
       "from Journal j left outer join Comments c " +
       "on c.journal = j where j.members.mid = :mid group by j ")
