@@ -4,6 +4,7 @@ import com.example.apiserver.entity.Members;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -16,12 +17,15 @@ class MembersRepositoryTests {
   @Autowired
   MembersRepository membersRepository;
 
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
   @Test
   public void insertMembers() {
     IntStream.rangeClosed(1, 100).forEach(i -> {
       Members members = Members.builder()
           .email("m" + i + "@m.m")
-          .pw("1")
+          .password(passwordEncoder.encode("1"))
           .name(generateName())
           .nickname("writer" + i)
           .mobile("010-1111-1" + return3Digit(i))

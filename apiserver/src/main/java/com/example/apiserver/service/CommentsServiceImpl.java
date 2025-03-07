@@ -18,15 +18,8 @@ import java.util.stream.Collectors;
 public class CommentsServiceImpl implements CommentsService {
   private final CommentsRepository commentsRepository;
 
-  public List<CommentsDTO> getListOfJournal(Long jno) {
-    List<Comments> result = commentsRepository.findByJournal(
-        Journal.builder().jno(jno).build());
-    return result.stream().map(comments -> entityToDto(comments)).collect(Collectors.toList());
-  }
-
   @Override
   public Long register(CommentsDTO commentsDTO) {
-    log.info("commentsDTO >> ",commentsDTO);
     Comments comments = dtoToEntity(commentsDTO);
     commentsRepository.save(comments);
     return comments.getCno();
@@ -34,7 +27,10 @@ public class CommentsServiceImpl implements CommentsService {
 
   @Override
   public List<CommentsDTO> getList(Long jno) {
-    return List.of();
+    List<Comments> result = commentsRepository.findByJournal(Journal.builder().jno(jno).build());
+    return result.stream().map(
+        comments -> entityToDto(comments)).collect(Collectors.toList()
+    );
   }
 
   @Override

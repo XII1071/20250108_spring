@@ -1,4 +1,4 @@
-package com.example.ex6.dto;
+package com.example.apiserver.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewDTO {
-  private Long reviewnum;
-  private Long mno; // Movie
-  private Long mid; // Member
+public class CommentsDTO {
+  private Long cno;
+  private Long jno;
+  private Long mid;
   private String nickname;
   private String email;
-  private int grade;
+  private Long likes;
   private String text;
   private LocalDateTime regDate, modDate;
 }

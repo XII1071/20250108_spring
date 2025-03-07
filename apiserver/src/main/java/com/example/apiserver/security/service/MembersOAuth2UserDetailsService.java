@@ -49,7 +49,7 @@ public class MembersOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     MembersAuthDTO membersAuthDTO = new MembersAuthDTO(
         members.getEmail(),
-        members.getPw(),
+        members.getPassword(),
         true,
         members.getRoleSet().stream().map(
                 role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
@@ -68,7 +68,7 @@ public class MembersOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     Members members = Members.builder()
         .email(email)
-        .pw(passwordEncoder.encode("1"))
+        .password(passwordEncoder.encode("1"))
         .fromSocial(true)
         .build();
     members.addMemberRole(MembersRole.USER);

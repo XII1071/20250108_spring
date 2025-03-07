@@ -16,9 +16,6 @@ public interface ReviewService {
 
   void remove(Long reviewnum);
 
-  void deleteReviewsByMovie(Long mno);
-
-
   default Review dtoToEntity(ReviewDTO reviewDTO) {
     Review review = Review.builder()
         .reviewnum(reviewDTO.getReviewnum())
@@ -29,6 +26,7 @@ public interface ReviewService {
         .build();
     return review;
   }
+
 
   default ReviewDTO entityToDto(Review review) {
     ReviewDTO reviewDTO = ReviewDTO.builder()
@@ -44,5 +42,4 @@ public interface ReviewService {
         .build();
     return reviewDTO;
   }
-
 }

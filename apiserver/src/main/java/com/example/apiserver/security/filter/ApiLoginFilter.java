@@ -28,13 +28,13 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
     log.info("ApiLoginFilter.....................................");
     String email = request.getParameter("email");
-    String pass = request.getParameter("pass");
+    String password = request.getParameter("password");
     if (email == null) {
       throw new BadCredentialsException("email cannot be null");
     }
 
     UsernamePasswordAuthenticationToken authToken =
-        new UsernamePasswordAuthenticationToken(email, pass);
+        new UsernamePasswordAuthenticationToken(email, password);
     return getAuthenticationManager().authenticate(authToken);
   }
 

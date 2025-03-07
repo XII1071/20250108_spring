@@ -49,7 +49,7 @@ public interface JournalService {
   }
 
   default JournalDTO entityToDTO(Journal journal, List<Photos> photosList,
-                                 Double avg, Long commentsCnt) {
+                               Long likes, Long commentsCnt) {
     JournalDTO journalDTO = JournalDTO.builder()
         .jno(journal.getJno())
         .title(journal.getTitle())
@@ -69,7 +69,7 @@ public interface JournalService {
       }).collect(Collectors.toList());
     }
     journalDTO.setPhotosDTOList(photosDTOList);
-    journalDTO.setAvg(avg);
+    journalDTO.setLikes(likes);
     journalDTO.setCommentsCnt(commentsCnt);
     return journalDTO;
   }

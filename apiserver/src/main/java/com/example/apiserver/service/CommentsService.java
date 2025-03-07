@@ -10,7 +10,7 @@ import java.util.List;
 public interface CommentsService {
   Long register(CommentsDTO commentsDTO);
 
-  List<CommentsDTO>getList(Long jno);
+  List<CommentsDTO> getList(Long mno);
 
   void modify(CommentsDTO commentsDTO);
 

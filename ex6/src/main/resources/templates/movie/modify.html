@@ -58,28 +58,26 @@
             </div>
             <div class="box"></div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btnModi">Modify</button>
-
-                <button type="button" class="btn btn-danger"
-                        th:if="${movieDTO.mno != null}"
-                        th:onclick="'deleteMovie(' + ${movieDTO.mno} + ')'">Delete</button>
-
-
-                <a th:href="@{/movie/list}">
-                    <button type="button" class="btn btn-info">Back</button>
-                </a>
+                <button class="btn btn-primary btnModi">Modify</button>
+                <button class="btn btn-danger btnDele">Delete</button>
+                <button class="btn btn-info btnBack">Back</button>
             </div>
         </form>
         <div class="uploadResult">
             <ul>
                 <li th:each="movieImageDTO : ${movieDTO.imageDTOList}"
-                    th:data-path="${movieImageDTO.path}"
-                    th:data-uuid="${movieImageDTO.uuid}"
-                    th:data-file="${movieImageDTO.getImageURL}"
-                    th:data-name="${movieImageDTO.imgName}">
+                    th:data-path='${movieImageDTO.path}'
+                    th:data-uuid='${movieImageDTO.uuid}'
+                    th:data-file='${movieImageDTO.getImageURL}'
+                    th:data-name='${movieImageDTO.imgName}'
+                    style="cursor:pointer;">
                     <div>
-                        <button type="button" class="removeBtn">X</button>
-                        <img th:src="@{/display(fileName=${movieImageDTO.getThumbnailURL})}" alt="이미지">
+                        <button type="button"
+                                th:onclick="deleteFileDb(this)">X
+                        </button>
+                        <img
+                                th:if="${movieImageDTO.path != null}"
+                                th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
                     </div>
                 </li>
             </ul>
@@ -101,135 +99,99 @@
             </div>
         </div>
         <script th:inline="javascript">
-            const mno = [[${movieDTO.mno}]];
+            const mno = [[${movieDTO.mno}]]
 
-            function checkExtension(fileName, fileSize) {
-                const maxSize = 1024 * 1024 * 10; // 10MB 제한
-                const regex = new RegExp("(.*?)\\.(jpg|jpeg|png|gif|bmp|pdf)$", 'i');
-                if (fileSize >= maxSize) {
-                    alert("파일 사이즈 초과");
-                    return false;
-                }
-                if (!regex.test(fileName)) {
-                    alert("해당파일 업로드 금지!");
-                    return false;
-                }
-                return true;
+            function checkExtension(fileName, fileSize){
+                maxSize = 1024*1024*10;
+                if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
+                // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
+                //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
+                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
+                if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
+                return true
             }
-
-            function attachRemoveEvent() {
-                const removeBtns = document.querySelectorAll(".removeBtn");
-                removeBtns.forEach(button => {
-                    button.onclick = function () {
-                        const targetLi = this.closest('li');
-                        const fileName = targetLi.dataset.file;
-                        const uuid = targetLi.dataset.uuid;
-                        const removeUrl = /*[[@{/removeFile}]]*/ '/removeFile';
-                        const formData = new FormData();
-                        formData.append("fileName", fileName);
-                        formData.append("uuid", uuid);
-                        fetch(removeUrl, {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(json => {
-                            if (json === true) {
-                                targetLi.remove();
-                                console.log("이미지 삭제 성공!");
-                            } else {
-                                console.log("이미지 삭제 실패");
-                            }
-                        })
-                        .catch(err => console.log("에러 발생:", err));
-                    };
-                });
-            }
-
-            function showResult(arr) {
-                const uploadResultUl = document.querySelector(".uploadResult ul");
-                const displayUrl = /*[[@{/display}]]*/ '/display';
-                let str = "";
-                arr.forEach(image => {
-                    str += `
-                        <li data-name="${image.fileName}" data-path="${image.folderPath}" data-uuid="${image.uuid}" data-file="${image.imageURL}">
-                            <div>
-                                <button type="button" class="removeBtn">X</button>
-                                <img src="${displayUrl}?fileName=${image.thumbnailURL}" alt="이미지">
-                            </div>
-                        </li>
-                    `;
-                });
-                uploadResultUl.insertAdjacentHTML('beforeend', str);
-                attachRemoveEvent();
-            }
-
             document.querySelector("#fileInput").onchange = function() {
                 let formData = new FormData();
+                const fileName = this.value.split("\\").pop();
+                let label = document.querySelector("#custom-label")
+                label.innerHTML = (this.files.length - 1) == 0 ?'':
+                    `${fileName} 외 ${fileInput.files.length - 1}개`
+
                 let files = this.files;
-                for (let i = 0; i < files.length; i++) {
-                    if (!checkExtension(files[i].name, files[i].size)) {
-                        this.value = '';
-                        return;
+                let isExtension = false;
+                for(let i=0;i<files.length;i++) {
+                    //console.log(files[i])
+                    if(!checkExtension(this.files[i].name, this.files[i].size)) {
+                        label.innerHTML = ''; this.value= '';
+                        isExtension = true; break;
                     }
-                    formData.append("uploadFiles", files[i]);
+                    formData.append("uploadFiles", files[i])
                 }
-                const uploadUrl = /*[[@{/uploadAjax}]]*/ '/uploadAjax';
-                fetch(uploadUrl, {
-                    method: 'POST',
-                    body: formData
+                if(isExtension) return;
+
+                const url = /*[[@{/uploadAjax}]]*/'url'
+                fetch(url, {
+                    method: 'POST', body: formData, dataType: 'json',
                 })
                 .then(res => res.json())
                 .then(json => {
-                    showResult(json);
+                    console.log(json)
+                    showResult(json)
                 })
-                .catch(err => console.log("에러 발생:", err));
-            };
-
-            document.querySelector(".btnModi").onclick = function(e) {
-                e.preventDefault();
-                const title = document.querySelector("#title");
-                if (title.value.trim() === "") {
-                    title.focus();
-                    return false;
-                }
-                let hiddenInputs = "";
-                const liArr = document.querySelectorAll(".uploadResult ul li");
-                liArr.forEach((li, index) => {
-                    hiddenInputs += `
-                        <input type="hidden" name="imageDTOList[${index}].imgName" value="${li.dataset.name}">
-                        <input type="hidden" name="imageDTOList[${index}].path" value="${li.dataset.path}">
-                        <input type="hidden" name="imageDTOList[${index}].uuid" value="${li.dataset.uuid}">
-                    `;
-                });
-                document.querySelector(".box").innerHTML = hiddenInputs;
-                document.querySelector("#frmSend").submit();
-            };
-
-            attachRemoveEvent();
-
-               function deleteMovie(mno) {
-        if (!confirm("정말로 삭제하시겠습니까?")) {
-            return;
-        }
-
-        const url = `/ex6/movie/delete/${mno}`;
-        fetch(url, { method: 'DELETE' })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("삭제 요청 실패");
-                }
-                return response.text();
-            })
-            .then(data => {
-                alert(`${mno}번 영화가 삭제되었습니다.`);
-                window.location.href = "/ex6/movie/list"; // ✅ 삭제 후 list 페이지로 이동
-            })
-            .catch(error => {
-                console.error("❌ 삭제 중 오류 발생:", error);
-                alert("영화 삭제 중 오류가 발생했습니다.");
-            });
+                .catch(err => console.log("Error occurred: " , err))
             }
+            function showResult(arr) {
+                const uploadUL = document.querySelector(".uploadResult ul");
+                let str = ""
+                const url = /*[[@{/display}]]*/'url'
+                for(let i=0;i<arr.length;i++){
+                  str += `<li data-name='${arr[i].fileName}' data-path='${arr[i].folderPath}'
+                  data-uuid='${arr[i].uuid}' data-file='${arr[i].imageURL}'><div>
+                  <button class="removeBtn" type="button">X</button>
+                  <img src="${url}?fileName=${arr[i].thumbnailURL}">
+                  </div></li>`
+                }
+                uploadUL.innerHTML += str;
+                const removeBtns = document.querySelectorAll(".removeBtn");
+                for(let i=0;i<removeBtns.length;i++){
+                  removeBtns[i].onclick = function() {
+                    const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                    const targetLi = this.closest('li')
+                    const fileName = targetLi.dataset.file;
+                    fetch(removeUrl+fileName, {
+                      method: 'POST', dataType: 'json', fileName: fileName
+                    })
+                    .then(response => response.json())
+                    .then(json => {
+                      console.log(json)
+                      if(json === true) targetLi.remove()
+                      document.querySelector("#custom-label").innerHTML = ''
+                      document.querySelector("#fileInput").value = '';
+                    })
+                    .catch(err => console.log("Error occurred: ", err))
+                  }
+                }
+            }
+
+            function deleteFileDb(btn) {
+                const removeUrl = /*[[@{/removeFile?fileName=}]]*/'removeUrl'
+                const targetLi = btn.closest('li')
+                const fileName = targetLi.dataset.file;
+                const uuid = targetLi.dataset.uuid;
+
+                fetch(removeUrl+fileName+"&uuid="+uuid, {
+                  method: 'POST', dataType: 'json', fileName: fileName
+                })
+                .then(response => response.json())
+                .then(json => {
+                  console.log(json)
+                  if(json === true) targetLi.remove()
+                })
+                .catch(err => console.log("Error occurred: ", err))
+
+                targetLi.remove()
+            }
+
         </script>
     </th:block>
 </th:block>

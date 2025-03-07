@@ -1,13 +1,14 @@
 package com.example.ex6.service;
 
 import com.example.ex6.dto.MovieDTO;
-import com.example.ex6.dto.MovieImageDTO;
 import com.example.ex6.dto.PageRequestDTO;
 import com.example.ex6.dto.PageResultDTO;
 import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.MovieImage;
 import com.example.ex6.repository.MovieImageRepository;
 import com.example.ex6.repository.MovieRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,8 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -29,16 +34,6 @@ public class MovieServiceImpl implements MovieService {
   private final MovieImageRepository movieImageRepository;
   @Value("${com.example.upload.path}")
   private String uploadPath;
-
-  @Override
-  public void addMovieImage(Long mno, MovieImageDTO movieImageDTO) {
-
-  }
-
-  @Override
-  public void deleteMovieImage(String uuid) {
-
-  }
 
   @Override
   public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
@@ -88,60 +83,7 @@ public class MovieServiceImpl implements MovieService {
   }
 
   @Override
-  @Transactional
-  public void modify(MovieDTO movieDTO) {
-    Optional<Movie> result = movieRepository.findById(movieDTO.getMno());
-
-    if (result.isPresent()) {
-      Movie movie = result.get();
-      movie.changeTitle(movieDTO.getTitle()); // 제목 변경
-
-      // ✅ 기존 이미지 삭제 후 새로운 이미지 저장
-      movieImageRepository.deleteByMovieMno(movieDTO.getMno());
-
-      List<MovieImage> newImageList = new ArrayList<>();
-      if (movieDTO.getImageDTOList() != null) {
-        for (MovieImageDTO imgDTO : movieDTO.getImageDTOList()) {
-          MovieImage newImage = MovieImage.builder()
-              .path(imgDTO.getPath())
-              .imgName(imgDTO.getImgName())
-              .uuid(imgDTO.getUuid())
-              .movie(movie)
-              .build();
-          newImageList.add(newImage);
-        }
-        movieImageRepository.saveAll(newImageList);
-      }
-
-      movieRepository.save(movie);
-    }
-  }
-
-
-  @Override
-  @Transactional
-  public void deleteMovie(Long mno) {
-    log.info("🔴 deleteMovie 호출됨: mno = " + mno);
-
-    Optional<Movie> result = movieRepository.findById(mno);
-    if (result.isPresent()) {
-      Movie movie = result.get();
-
-      // ✅ 관련 이미지 삭제
-      log.info("🟡 관련 이미지 삭제 시작...");
-      movieImageRepository.deleteByMovieMno(mno);
-      log.info("✅ 관련 이미지 삭제 완료");
-
-      // ✅ 영화 삭제
-      movieRepository.delete(movie);
-      log.info("✅ 영화 삭제 완료: " + mno);
-    } else {
-      throw new IllegalArgumentException("해당 영화가 존재하지 않습니다: " + mno);
-    }
-  }
-
-  @Override
   public void removeMovieImagebyUUID(String uuid) {
-
+    movieImageRepository.deleteByUuid(uuid);
   }
 }

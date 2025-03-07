@@ -27,7 +27,7 @@ public class MembersUserDetailsService implements UserDetailsService {
     Members members = result.get();
 
     MembersAuthDTO membersAuthDTO = new MembersAuthDTO(
-        members.getEmail(), members.getPw(),
+        members.getEmail(), members.getPassword(),
         members.getRoleSet().stream().map(
             membersRole -> new SimpleGrantedAuthority(
                 "ROLE_" + membersRole.name()

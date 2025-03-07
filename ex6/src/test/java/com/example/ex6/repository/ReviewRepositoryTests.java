@@ -31,10 +31,10 @@ class ReviewRepositoryTests {
 
       Member member = Member.builder().mid(mid).build();
       Review review = Review.builder().member(member)
-              .movie(Movie.builder().mno(mno).build())
-              .grade((int)(Math.random()*5)+1)
-              .text("이 영화에 대하여..."+i)
-              .build();
+          .movie(Movie.builder().mno(mno).build())
+          .grade((int)(Math.random()*5)+1)
+          .text("이 영화에 대하여..."+i)
+          .build();
       reviewRepository.save(review);
     });
   }
@@ -59,6 +59,7 @@ class ReviewRepositoryTests {
     memberRepository.deleteById(1L);
   }
 }
+
 
 
 
