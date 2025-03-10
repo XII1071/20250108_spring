@@ -106,7 +106,7 @@
                 if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
                 // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
                 //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
-                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
+                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i 대소문자구분X
                 if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
                 return true
             }

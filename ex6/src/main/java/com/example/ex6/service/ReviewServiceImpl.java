@@ -39,6 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
     Optional<Review> result = reviewRepository.findById(reviewDTO.getReviewnum());
     if (result.isPresent()) {
       Review review = result.get();
+      /* 리뷰에서 변경할 텍스트, 별점(grade) */
       review.changeGrade(reviewDTO.getGrade());
       review.changeText(reviewDTO.getText());
       reviewRepository.save(review);

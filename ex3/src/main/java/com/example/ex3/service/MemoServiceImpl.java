@@ -5,8 +5,6 @@ import com.example.ex3.entity.Memo;
 import com.example.ex3.repository.MemoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class MemoServiceImpl implements MemoService {
   public MemoServiceImpl(MemoRepository memoRepository) {
@@ -25,9 +23,6 @@ public class MemoServiceImpl implements MemoService {
 
   @Override
   public MemoDTO read(Long mno) {
-    Optional<Memo> result = memoRepository.findById(mno);
-    if(result.isPresent())
-      return entityToDto(result.get());
     return null;
   }
 

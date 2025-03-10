@@ -1,4 +1,4 @@
-package com.example.ex7.entity;
+package com.example.ex6.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -10,10 +10,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@MappedSuperclass
+@MappedSuperclass // 이 클래스는 테이블로 생성되지 않는 설정
 @EntityListeners(value = {AuditingEntityListener.class})
 @Getter
-abstract class BaseEntity {
+abstract class BasicEntity {
 
   @CreatedDate
   @Column(name = "regdate", updatable = false)
@@ -22,4 +22,5 @@ abstract class BaseEntity {
   @LastModifiedDate
   @Column(name = "moddate")
   private LocalDateTime modDate;
+
 }

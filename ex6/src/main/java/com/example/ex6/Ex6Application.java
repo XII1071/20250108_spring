@@ -12,5 +12,5 @@ public class Ex6Application {
 		SpringApplication.run(Ex6Application.class, args);
 		System.out.println("http://localhost:8080/ex6");
 	}
-
 }
+

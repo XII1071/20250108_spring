@@ -27,7 +27,6 @@ public interface ReviewService {
     return review;
   }
 
-
   default ReviewDTO entityToDto(Review review) {
     ReviewDTO reviewDTO = ReviewDTO.builder()
         .reviewnum(review.getReviewnum())

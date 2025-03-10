@@ -1,5 +1,4 @@
 package com.example.ex6.repository.search;
-
 import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.QMovie;
 import com.example.ex6.entity.QMovieImage;
@@ -22,14 +21,39 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
-public class SearchMovieRepositoryImpl extends QuerydslRepositorySupport
-    implements SearchMovieRepository {
-  public SearchMovieRepositoryImpl() {
+public class SearchRepositoryImpl extends QuerydslRepositorySupport
+    implements SearchRepository {
+  public SearchRepositoryImpl() {
     super(Movie.class);
   }
 
+//  @Override
+//  public Movie search1() {
+//    log.info("search1.................");
+//    QMovie movie = QMovie.movie;
+//    QMovieImage movieImage = QMovieImage.movieImage;
+//    QReview review = QReview.review;
+//
+//    JPQLQuery<Movie> jpqlQuery = from(movie);
+//    jpqlQuery.leftJoin(movieImage).on(movieImage.movie.eq(movie));
+//    jpqlQuery.leftJoin(review).on(review.movie.eq(movie));
+//
+//    JPQLQuery<Tuple> tuple = jpqlQuery.select(movie, movieImage.movie, review.count());
+//    tuple.groupBy(movie);
+//
+//    log.info("==========================");
+//    log.info(tuple);
+//    log.info("==========================");
+//
+//    List<Tuple> result = tuple.fetch();
+//    log.info("result: " + result);
+//
+//    return null;
+//  }
+
   @Override
   public Page<Object[]> searchPage(String type, String keyword, Pageable pageable) {
+    log.info("searchPage...............");
     //1) q도메인을 확보
     QMovie movie = QMovie.movie;
     QMovieImage movieImage = QMovieImage.movieImage;
@@ -64,6 +88,7 @@ public class SearchMovieRepositoryImpl extends QuerydslRepositorySupport
       }
       booleanBuilder.and(conditionBuilder);
     }
+
     //6) 조인된 tuple에서 조건절에 위에서 생성한 booleanBuilder로 검색한다.
     tuple.where(booleanBuilder);
 
@@ -94,9 +119,6 @@ public class SearchMovieRepositoryImpl extends QuerydslRepositorySupport
     log.info("COUNT: " + count);
 
     //13) 출력하고자 하는 Page객체를 위한 PageImpl객체로 생성
-    return new PageImpl<Object[]>(result.stream().map(
-        t -> t.toArray()).collect(Collectors.toList()), pageable, count);
-
+    return new PageImpl<Object[]>(result.stream().map(t -> t.toArray()).collect(Collectors.toList()), pageable, count);
   }
-
 }

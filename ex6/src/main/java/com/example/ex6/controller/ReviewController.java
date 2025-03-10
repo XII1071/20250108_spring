@@ -1,7 +1,6 @@
 package com.example.ex6.controller;
 
 import com.example.ex6.dto.ReviewDTO;
-import com.example.ex6.repository.ReviewRepository;
 import com.example.ex6.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,7 +22,7 @@ public class ReviewController {
   public ResponseEntity<List<ReviewDTO>> getListByMovie(@PathVariable("mno") Long mno) {
     return new ResponseEntity<>(reviewService.getList(mno), HttpStatus.OK);
   }
-  
+
   @PostMapping(value = {"", "/"})
   public ResponseEntity<String> register(@RequestBody ReviewDTO reviewDTO) {
     return new ResponseEntity<>(reviewService.register(reviewDTO)+"번 리뷰 등록", HttpStatus.OK);

@@ -37,10 +37,10 @@ class MovieRepositoryTests {
       int count = (int)(Math.random()*5) + 1;
       for (int j = 0; j < count; j++) {
         MovieImage movieImage = MovieImage.builder()
-            .uuid(UUID.randomUUID().toString())
-            .movie(movie)
-            .imgName("test"+j+".jpg")
-            .build();
+                .uuid(UUID.randomUUID().toString())
+                .movie(movie)
+                .imgName("test"+j+".jpg")
+                .build();
         movieImageRepository.save(movieImage);
       }
     });
@@ -49,7 +49,7 @@ class MovieRepositoryTests {
   @Test
   public void testGetListPage() {
     PageRequest pageRequest =
-        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
     Page<Object[]> result = movieRepository.getListPage(pageRequest);
     for (Object[] objects : result.getContent()) {
       System.out.println(Arrays.toString(objects));
@@ -58,7 +58,7 @@ class MovieRepositoryTests {
   @Test
   public void testGetListPageImg() {
     PageRequest pageRequest =
-        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
     Page<Object[]> result = movieRepository.getListPageImg(pageRequest);
     for (Object[] objects : result.getContent()) {
       System.out.println(Arrays.toString(objects));
@@ -78,7 +78,7 @@ class MovieRepositoryTests {
   @Test
   public void testGetListPageImgNative() {
     PageRequest pageRequest =
-        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "movie_mno"));
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "movie_mno"));
     Page<Object[]> result = movieRepository.getListPageImgNative(pageRequest);
     for (Object[] objArr : result.getContent()) {
       System.out.println(Arrays.toString(objArr));
@@ -88,7 +88,7 @@ class MovieRepositoryTests {
   @Test
   public void testGetListPageImgJPQL() {
     PageRequest pageRequest =
-        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "mno"));
     Page<Object[]> result = movieRepository.getListPageImgJPQL(pageRequest);
     for (Object[] objArr : result.getContent()) {
       System.out.println(Arrays.toString(objArr));
@@ -98,7 +98,7 @@ class MovieRepositoryTests {
   @Test
   public void testGetMaxQuery() {
     PageRequest pageRequest =
-        PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "movie"));
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "movie"));
     Page<Object[]> result = movieRepository.getMaxQuery(pageRequest);
     for (Object[] objArr : result.getContent()) {
       System.out.println(Arrays.toString(objArr));
