@@ -20,7 +20,7 @@ import java.util.Map;
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/journal")
 public class JournalController {
   private final JournalService journalService;
 

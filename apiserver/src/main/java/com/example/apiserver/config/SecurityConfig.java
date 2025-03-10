@@ -14,14 +14,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
-      "/"
       //,"/notes/**"
+      "members/register"
   };
 
   @Bean
@@ -30,11 +31,18 @@ public class SecurityConfig {
 
     httpSecurity.authorizeHttpRequests(
         auth -> auth
-            //.requestMatchers(AUTH_WHITELIST).permitAll()
-            //.requestMatchers(new AntPathRequestMatcher("/notes/**")).permitAll()
-            //.requestMatchers("/notes/**").permitAll()
-            //.anyRequest().denyAll()
-            .anyRequest().permitAll()
+//            .anyRequest().permitAll() // 모든 주소 허용 :: 단독 사용
+            
+            // 회원가입이기 때문에 무조건 수용(나중에 CORS로 지정하면 됨)
+            .requestMatchers(AUTH_WHITELIST).permitAll()
+
+            // 조건부 허용:: 주소는 열어 줬지만, 토큰으로 필터 체크
+            .requestMatchers(new AntPathRequestMatcher("/journal/**")).permitAll()
+            .requestMatchers("/comments/**").permitAll()
+            .requestMatchers("/members/get/**").permitAll()
+
+            // 그 외는 모두 막음
+            .anyRequest().denyAll()
     );
 
     httpSecurity.addFilterBefore(
@@ -57,7 +65,8 @@ public class SecurityConfig {
 
   @Bean
   public ApiCheckFilter apiCheckFilter() {
-    return new ApiCheckFilter(new String[]{"/notes/**"}, jwtUtil());
+    return new ApiCheckFilter(new String[]{"/comments/**", "/journal/**", "/members/get/**"},
+        jwtUtil());
   }
 
   @Bean

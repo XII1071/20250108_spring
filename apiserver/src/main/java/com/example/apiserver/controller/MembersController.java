@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class MembersController {
   private final MembersService membersService;
 
-  @PostMapping(value = "")
+  @PostMapping(value = "/register")
   public ResponseEntity<Long> register(@RequestBody MembersDTO membersDTO) {
     log.info("register.....................");
     return new ResponseEntity<>(membersService.registerMembers(membersDTO), HttpStatus.OK);
   }
 
-  @GetMapping(value = "/{mid}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/get/{mid}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<MembersDTO> read(@PathVariable("mid") Long mid) {
     return new ResponseEntity<>(membersService.getMembers(mid), HttpStatus.OK);
   }
