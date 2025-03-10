@@ -64,7 +64,7 @@ public class SecurityConfig {
   public ApiLoginFilter apiLoginFilter(
       // AuthenticationConfiguration :: Spring Security에서 모든 인증을 처리(UserDetailsService호출)
       AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login", jwtUtil());
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/auth/login", jwtUtil());
 
     apiLoginFilter.setAuthenticationManager(
         authenticationConfiguration.getAuthenticationManager()
