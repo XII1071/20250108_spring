@@ -1,10 +1,8 @@
 package com.example.apiserver.service;
 
-import com.example.apiserver.dto.JournalDTO;
-import com.example.apiserver.dto.PageRequestDTO;
-import com.example.apiserver.dto.PageResultDTO;
-import com.example.apiserver.dto.PhotosDTO;
+import com.example.apiserver.dto.*;
 import com.example.apiserver.entity.Journal;
+import com.example.apiserver.entity.Members;
 import com.example.apiserver.entity.Photos;
 
 import java.util.ArrayList;
@@ -49,11 +47,20 @@ public interface JournalService {
   }
 
   default JournalDTO entityToDTO(Journal journal, List<Photos> photosList,
-                               int likes, Long commentsCnt) {
+                                 Members members,int likes, Long commentsCnt) {
+
+    MembersDTO membersDTO = MembersDTO.builder()
+        .mid(members.getMid())
+        .name(members.getName())
+        .email(members.getEmail())
+        .nickname(members.getNickname())
+        .mobile(members.getMobile())
+        .build();
     JournalDTO journalDTO = JournalDTO.builder()
         .jno(journal.getJno())
         .title(journal.getTitle())
         .content(journal.getContent())
+        .membersDTO(membersDTO)
         .regDate(journal.getRegDate())
         .modDate(journal.getModDate())
         .build();

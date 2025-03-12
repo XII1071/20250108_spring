@@ -43,9 +43,10 @@ public interface JournalRepository extends JpaRepository<Journal, Long>, SearchJ
   @Query("select journal, max(p.pno) from Photos p group by journal")
   Page<Object[]> getMaxQuery(Pageable pageable);
 
-  @Query("select j, p, sum(coalesce(c.likes, 0)), count(c) " +
+  @Query("select j, p, m, sum(coalesce(c.likes, 0)), count(c) " +
       "from Journal j left outer join Photos p on p.journal=j " +
       "left outer join Comments c on c.journal = j " +
+      "left outer join Members m on j.members = m " +
       "where j.jno = :jno group by p ")
   List<Object[]> getJournalWithAll(@Param("jno") Long jno);
 }

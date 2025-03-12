@@ -4,6 +4,7 @@ import com.example.apiserver.dto.JournalDTO;
 import com.example.apiserver.dto.PageRequestDTO;
 import com.example.apiserver.dto.PageResultDTO;
 import com.example.apiserver.entity.Journal;
+import com.example.apiserver.entity.Members;
 import com.example.apiserver.entity.Photos;
 import com.example.apiserver.repository.CommentsRepository;
 import com.example.apiserver.repository.JournalRepository;
@@ -44,11 +45,13 @@ public class JournalServiceImpl implements JournalService {
     Function<Object[], JournalDTO> fn = new Function<Object[], JournalDTO>() {
       @Override
       public JournalDTO apply(Object[] objects) {
-        return JournalServiceImpl.this.entityToDTO(
+        // journal, photos, members, comments.likes.sum().coalesce(0), comments.count()
+        return entityToDTO(
             (Journal) objects[0],
             (List<Photos>) (Arrays.asList((Photos) objects[1])),
-            (int) objects[2],
-            (Long) objects[3]
+            (Members) objects[2],
+            (int) objects[3],
+            (Long) objects[4]
         );
       }
     };
@@ -82,11 +85,12 @@ public class JournalServiceImpl implements JournalService {
         photosList.add((Photos) objects[1]);
       }
     });
+    Members members = (Members) result.get(0)[2];
 
-    int likes = (int) result.get(0)[2];
-    Long commentsCnt = (Long) result.get(0)[3];
+    int likes = (int) result.get(0)[3];
+    Long commentsCnt = (Long) result.get(0)[4];
 
-    return entityToDTO(journal, photosList, likes, commentsCnt);
+    return entityToDTO(journal, photosList, members, likes, commentsCnt);
   }
 
   @Transactional

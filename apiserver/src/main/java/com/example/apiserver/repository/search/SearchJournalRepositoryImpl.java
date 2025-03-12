@@ -1,9 +1,6 @@
 package com.example.apiserver.repository.search;
 
-import com.example.apiserver.entity.Journal;
-import com.example.apiserver.entity.QComments;
-import com.example.apiserver.entity.QJournal;
-import com.example.apiserver.entity.QPhotos;
+import com.example.apiserver.entity.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
@@ -34,15 +31,17 @@ public class SearchJournalRepositoryImpl extends QuerydslRepositorySupport
     QJournal journal = QJournal.journal;
     QPhotos photos = QPhotos.photos;
     QComments comments = QComments.comments;
+    QMembers members = QMembers.members;
 
     //2) q도메인을 조인
     JPQLQuery<Journal> jpqlQuery = from(journal);
     jpqlQuery.leftJoin(photos).on(photos.journal.eq(journal));
     jpqlQuery.leftJoin(comments).on(comments.journal.eq(journal));
+    jpqlQuery.leftJoin(members).on(journal.members.eq(members));
 
     //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
     JPQLQuery<Tuple> tuple =
-        jpqlQuery.select(journal, photos, comments.likes.sum().coalesce(0), comments.count());
+        jpqlQuery.select(journal, photos, members, comments.likes.sum().coalesce(0), comments.count());
 
     //4) 조건절 생성
     BooleanBuilder booleanBuilder = new BooleanBuilder();
