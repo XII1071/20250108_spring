@@ -26,7 +26,7 @@ public class GuestbookServiceImpl implements GuestbookService {
 
   @Override
   public Long register(GuestbookDTO guestbookDTO) {
-    log.info("guestbookDTO: " + guestbookDTO);
+    log.info("guestbookDTO: "+guestbookDTO);
     Guestbook guestbook = dtoToEntity(guestbookDTO);
     guestbookRepository.save(guestbook);
     return guestbook.getGno();
@@ -84,17 +84,19 @@ public class GuestbookServiceImpl implements GuestbookService {
     BooleanBuilder booleanBuilder = new BooleanBuilder();
     // 동적 검색을 위한 객체를 생성
     QGuestbook qGuestbook = QGuestbook.guestbook;
-    // 전체를 조건정의, 검색없을 경우 전체를 지정
+    //전체를 조건정의, 검색없을경우 전체를 지정
     BooleanExpression expression = qGuestbook.gno.gt(0L);
-    booleanBuilder.and(expression); // 첫번째 조건을 적용
+    booleanBuilder.and(expression); //첫번째 조건을 적용
 
     BooleanBuilder conditionBuilder = new BooleanBuilder();
-    if (type == null || type.trim().length() == 0) return booleanBuilder;
-    if (keyword == null || keyword.trim().length() == 0) return booleanBuilder;
 
-    if (type.contains("t")) conditionBuilder.or(qGuestbook.title.contains(keyword));
-    if (type.contains("c")) conditionBuilder.or(qGuestbook.content.contains(keyword));
-    if (type.contains("w")) conditionBuilder.or(qGuestbook.writer.contains(keyword));
+    // 검색 조건이 없는 경우
+    if(type==null || type.trim().length() == 0) return booleanBuilder;
+    if(keyword==null || keyword.trim().length() == 0) return booleanBuilder;
+
+    if(type.contains("t")) conditionBuilder.or(qGuestbook.title.contains(keyword));
+    if(type.contains("c")) conditionBuilder.or(qGuestbook.content.contains(keyword));
+    if(type.contains("w")) conditionBuilder.or(qGuestbook.writer.contains(keyword));
     booleanBuilder.and(conditionBuilder);
     return booleanBuilder;
   }

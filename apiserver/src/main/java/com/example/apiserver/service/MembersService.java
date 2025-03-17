@@ -12,7 +12,7 @@ public interface MembersService {
   Long updateMembers(MembersDTO membersDTO);
   void removeMembers(Long mid);
   MembersDTO getMembers(Long mid);
-  MembersDTO loginCheck(String email);
+  MembersDTO getMembersByEmail(String email);
 
   default Members dtoToEnitity(MembersDTO membersDTO) {
     Members members = Members.builder()

@@ -31,9 +31,9 @@ class GuestbookRepositoryTests {
       @Override
       public void accept(int i) {
         Guestbook guestbook = Guestbook.builder()
-            .title("Title..." + i)
-            .content("Content..." + i)
-            .writer("user" + (i % 10))
+            .title("Title..."+i)
+            .content("Content..."+i)
+            .writer("user"+(i%10))
             .build();
         System.out.println(guestbookRepository.save(guestbook));
       }

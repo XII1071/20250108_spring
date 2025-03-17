@@ -43,12 +43,12 @@
             <div class="form-group">
                 <label for="regDate">RegDate</label>
                 <input type="text" name="regDate" id="regDate" class="form-control" readonly
-                       th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd HH:mm')}">
+                  th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
                 <input type="text" name="modDate" id="modDate" class="form-control"readonly
-                       th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd HH:mm')}">
+                  th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <a class="btn btn-primary" th:href="@{/movie/modify(page=${pageRequestDTO.page},mno=${movieDTO.mno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Modify</a>

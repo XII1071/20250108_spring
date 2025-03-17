@@ -32,9 +32,7 @@ public class GuestbookController {
   }
 
   @GetMapping("/register")
-  public void register() {
-  }
-
+  public void register() {  }
   @PostMapping("/register")
   public String registerPost(GuestbookDTO guestbookDTO, RedirectAttributes ra) {
     Long gno = guestbookService.register(guestbookDTO);
@@ -63,7 +61,6 @@ public class GuestbookController {
     ra.addAttribute("keyword", pageRequestDTO.getKeyword());
     return "redirect:/guestbook/read";
   }
-
   @PostMapping("/remove")
   public String remove(GuestbookDTO guestbookDTO,
                        PageRequestDTO pageRequestDTO, RedirectAttributes ra) {

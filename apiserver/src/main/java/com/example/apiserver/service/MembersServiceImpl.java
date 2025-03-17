@@ -26,7 +26,7 @@ public class MembersServiceImpl implements MembersService {
   }
 
   @Override
-  public MembersDTO loginCheck(String email) {
+  public MembersDTO getMembersByEmail(String email) {
     Optional<Members> result = membersRepository.findByEmail(email);
     if (result.isPresent()) return entityToDTO(result.get());
     return null;

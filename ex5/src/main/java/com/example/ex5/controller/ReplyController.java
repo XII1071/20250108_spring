@@ -18,7 +18,7 @@ import java.util.List;
 public class ReplyController {
   private final ReplyService replyService;
 
-  @GetMapping(value = "/board/{bno}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{bno}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<ReplyDTO>> getListByBoard(@PathVariable("bno") Long bno) {
     return new ResponseEntity<>(replyService.getList(bno), HttpStatus.OK);
   }

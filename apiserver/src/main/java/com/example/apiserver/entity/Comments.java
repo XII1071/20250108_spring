@@ -20,8 +20,8 @@ public class Comments extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   private Members members;
 
-  private int likes; //별점
+  private Long likes; //별점
   private String text; //한줄평
-  public void changeLikes(int likes) {this.likes = likes;}
+  public void changeLikes(Long likes) {this.likes = likes;}
   public void changeText(String text) {this.text = text;}
 }

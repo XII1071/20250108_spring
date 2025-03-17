@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @Getter
 @Builder
-// 밑에 3개는 setter 생성자
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

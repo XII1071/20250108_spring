@@ -41,7 +41,7 @@ public class SearchJournalRepositoryImpl extends QuerydslRepositorySupport
 
     //3) Tuple생성 : 조인을 한 결과의 데이터를 tuple로 생성
     JPQLQuery<Tuple> tuple =
-        jpqlQuery.select(journal, photos, members, comments.likes.sum().coalesce(0), comments.count());
+        jpqlQuery.select(journal, photos, members, comments.likes.sum().coalesce(0L), comments.count());
 
     //4) 조건절 생성
     BooleanBuilder booleanBuilder = new BooleanBuilder();

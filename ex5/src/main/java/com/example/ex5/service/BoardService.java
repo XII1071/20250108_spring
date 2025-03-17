@@ -13,10 +13,10 @@ public interface BoardService {
         .title(boardDTO.getTitle())
         .content(boardDTO.getContent())
         .writer(Member.builder().email(boardDTO.getWriterEmail()).build())
-        // entity email 를 들고오는것
         .build();
     return board;
   }
+
   public default BoardDTO entityToDto(Board board, Member member, Long replyCount) {
     BoardDTO boardDTO = BoardDTO.builder()
         .bno(board.getBno())

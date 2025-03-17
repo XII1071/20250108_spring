@@ -27,14 +27,10 @@ public interface GuestbookService {
         .build();
     return guestbookDTO;
   }
-
   Long register(GuestbookDTO guestbookDTO);
-
   PageResultDTO<GuestbookDTO, Guestbook> getList(PageRequestDTO pageRequestDTO);
-
   GuestbookDTO read(Long gno);
 
   Long modify(GuestbookDTO guestbookDTO);
-
   Long remove(GuestbookDTO guestbookDTO);
 }

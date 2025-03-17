@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/memo")
 
-//get 페이지 이동 post는 전송
 public class MemoController {
   public MemoController(MemoService memoService) {
     this.memoService = memoService;
@@ -25,16 +24,25 @@ public class MemoController {
     return "/memo/regist";
   }
 
-  @PostMapping("/post")
+  @PostMapping("/regist")
   public String post(MemoDTO memoDTO, Model model) {
-    // model 뷰단으로 보내는것.
     System.out.println(">> "+memoDTO);
     Long mno = memoService.register(memoDTO);
     model.addAttribute("mno", mno);
-    return "/memo/memo";
+    return "/memo/regist";
   }
+
+  // 단순히 읽기 페이지로만 이동
   @GetMapping("/read")
-  public String read() {
+  public void read() {  }
+
+  // 읽기 페이지에서 글번호를 글내용 가져오기
+  @GetMapping("/get")
+  public String readGet(Long mno, Model model) {
+    System.out.println("get");
+    MemoDTO memoDTO = memoService.read(mno);
+    System.out.println(memoDTO);
+    model.addAttribute("memoDto", memoDTO);
     return "/memo/read";
   }
 

@@ -26,5 +26,9 @@ public class MembersController {
   public ResponseEntity<MembersDTO> read(@PathVariable("mid") Long mid) {
     return new ResponseEntity<>(membersService.getMembers(mid), HttpStatus.OK);
   }
+  @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<MembersDTO> get(String email) {
+    return new ResponseEntity<>(membersService.getMembersByEmail(email), HttpStatus.OK);
+  }
 
 }

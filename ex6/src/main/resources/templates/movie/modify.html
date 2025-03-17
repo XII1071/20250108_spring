@@ -106,7 +106,7 @@
                 if(fileSize >= maxSize) {alert("파일사이즈 초과");return false; }
                 // https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_expressions
                 //const regex = new RegExp("(.*?)\.(exe|sh|zip|alz|tiff)$");
-                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i 대소문자구분X
+                const regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif|bmp|pdf)$",'i');//i대소문자구분X
                 if(!regex.test(fileName)) {alert("해당파일 업로드 금지!");return false; }
                 return true
             }
@@ -188,8 +188,41 @@
                   if(json === true) targetLi.remove()
                 })
                 .catch(err => console.log("Error occurred: ", err))
+            }
+            btnModi = document.querySelector(".btnModi")
+            btnDele = document.querySelector(".btnDele")
+            btnBack = document.querySelector(".btnBack")
+            frmSend = document.querySelector("#frmSend")
+            btnModi.onclick = e => {
+                e.preventDefault() // 유효성검사 넣어줄 것!
+                const title = document.querySelector("input[name='title']")
+                if(title.value == "") {title.focus();return false;}
 
-                targetLi.remove()
+                let str = "";
+                const liArr = document.querySelectorAll(".uploadResult ul li");
+                for(let i=0;i<liArr.length;i++){
+                  str += `
+                    <input type="hidden" name="imageDTOList[${i}].imgName" value="${liArr[i].dataset.name}">
+                    <input type="hidden" name="imageDTOList[${i}].path" value="${liArr[i].dataset.path}">
+                    <input type="hidden" name="imageDTOList[${i}].uuid" value="${liArr[i].dataset.uuid}">
+                  `
+                }
+                document.querySelector(".box").innerHTML = str;
+                /*if(fileInput.files.length == 0) {
+                  document.querySelector("#custom-label").innerHTML =
+                    "파일을 선택하세요!"
+                  fileInput.focus(); return false;
+                }*/
+                frmSend.submit();
+            }
+            btnDele.onclick = e => {
+                e.preventDefault()
+                frmSend.setAttribute('action', /*[[@{/movie/remove}]]*/'remove')
+                frmSend.submit();
+            }
+            btnBack.onclick = e => {
+                e.preventDefault()
+                window.history.back();
             }
 
         </script>

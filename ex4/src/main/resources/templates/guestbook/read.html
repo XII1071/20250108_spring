@@ -30,18 +30,16 @@
             <div class="form-group">
                 <label for="regDate">RegDate</label>
                 <input type="text" name="regDate" id="regDate" class="form-control" readonly
-                       th:value="${#temporals.format(guestbookDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+                  th:value="${#temporals.format(guestbookDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">ModDate</label>
-                <input type="text" name="modDate" id="modDate" class="form-control" readonly
-                       th:value="${#temporals.format(guestbookDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+                <input type="text" name="modDate" id="modDate" class="form-control"readonly
+                  th:value="${#temporals.format(guestbookDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
-                <a class="btn btn-primary"
-                   th:href="@{/guestbook/modify(page=${pageRequestDTO.page},gno=${guestbookDTO.gno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">Modify</a>
-                <a class="btn btn-info"
-                   th:href="@{/guestbook/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">List</a>
+                <a class="btn btn-primary" th:href="@{/guestbook/modify(page=${pageRequestDTO.page},gno=${guestbookDTO.gno},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Modify</a>
+                <a class="btn btn-info" th:href="@{/guestbook/list(page=${pageRequestDTO.page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >List</a>
             </div>
         </form>
         <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

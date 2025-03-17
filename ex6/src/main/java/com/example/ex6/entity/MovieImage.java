@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "movie")
-public class MovieImage extends BaseEntity{
+public class MovieImage extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long inum;
@@ -23,4 +23,3 @@ public class MovieImage extends BaseEntity{
   @ManyToOne(fetch = FetchType.LAZY)
   private Movie movie;
 }
-/* uuid */

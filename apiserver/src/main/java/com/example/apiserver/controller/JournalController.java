@@ -42,6 +42,8 @@ public class JournalController {
 
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
   public ResponseEntity<Long> registerJournal(@RequestBody JournalDTO journalDTO) {
+    System.out.println(">>>"+journalDTO);
+
     Long jno = journalService.register(journalDTO);
     return new ResponseEntity<>(jno, HttpStatus.OK);
   }
@@ -54,7 +56,7 @@ public class JournalController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @PostMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/modify", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Map<String, String>> modify(@RequestBody JournalDTO dto,
                                                     @RequestBody PageRequestDTO pageRequestDTO) {
     log.info("modify post... dto: " + dto);

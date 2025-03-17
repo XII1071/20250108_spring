@@ -23,7 +23,7 @@ public class JournalDTO {
   private List<PhotosDTO> photosDTOList = new ArrayList<>();
 
   private MembersDTO membersDTO;
-  private int likes;
+  private Long likes;
   private Long commentsCnt;
   private LocalDateTime regDate;
   private LocalDateTime modDate;

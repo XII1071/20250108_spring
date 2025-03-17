@@ -27,7 +27,12 @@ public interface JournalService {
   default Map<String, Object> dtoToEntity(JournalDTO journalDTO) {
     Map<String, Object> entityMap = new HashMap<>();
 
-    Journal journal = Journal.builder().jno(journalDTO.getJno()).title(journalDTO.getTitle()).build();
+    Journal journal = Journal.builder()
+        .jno(journalDTO.getJno())
+        .title(journalDTO.getTitle())
+        .content(journalDTO.getContent())
+        .members(Members.builder().mid(journalDTO.getMembersDTO().getMid()).build())
+        .build();
     entityMap.put("journal", journal);
 
     List<PhotosDTO> photosDTOList = journalDTO.getPhotosDTOList();
@@ -47,7 +52,7 @@ public interface JournalService {
   }
 
   default JournalDTO entityToDTO(Journal journal, List<Photos> photosList,
-                                 Members members,int likes, Long commentsCnt) {
+                                 Members members,Long likes, Long commentsCnt) {
 
     MembersDTO membersDTO = MembersDTO.builder()
         .mid(members.getMid())

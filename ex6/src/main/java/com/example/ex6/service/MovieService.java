@@ -21,6 +21,10 @@ public interface MovieService {
 
   MovieDTO get(Long mno);
 
+  void modify(MovieDTO movieDTO);
+
+  List<String> removeWithReviewsAndMovieImages(Long mno);
+
   void removeMovieImagebyUUID(String uuid);
 
   default Map<String, Object> dtoToEntity(MovieDTO movieDTO) {
@@ -47,7 +51,7 @@ public interface MovieService {
   }
 
   default MovieDTO entityToDTO(Movie movie, List<MovieImage> movieImages,
-                               Double avg, Long reviewCnt) {
+                                 Double avg, Long reviewCnt) {
     MovieDTO movieDTO = MovieDTO.builder()
         .mno(movie.getMno())
         .title(movie.getTitle())
@@ -72,3 +76,4 @@ public interface MovieService {
   }
 
 }
+

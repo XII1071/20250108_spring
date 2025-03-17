@@ -7,18 +7,23 @@ import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.MovieImage;
 import com.example.ex6.repository.MovieImageRepository;
 import com.example.ex6.repository.MovieRepository;
+import com.example.ex6.repository.ReviewRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.net.URLDecoder;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -28,6 +33,8 @@ import java.util.function.Function;
 public class MovieServiceImpl implements MovieService {
   private final MovieRepository movieRepository;
   private final MovieImageRepository movieImageRepository;
+  private final ReviewRepository reviewRepository;
+
   @Value("${com.example.upload.path}")
   private String uploadPath;
 
@@ -82,4 +89,84 @@ public class MovieServiceImpl implements MovieService {
   public void removeMovieImagebyUUID(String uuid) {
     movieImageRepository.deleteByUuid(uuid);
   }
+
+  @Transactional
+  @Override
+  public void modify(MovieDTO movieDTO) {
+    Optional<Movie> result = movieRepository.findById(movieDTO.getMno());
+    if (result.isPresent()) {
+      Map<String, Object> entityMap = dtoToEntity(movieDTO);
+      Movie movie = (Movie) entityMap.get("movie");
+      movie.changeTitle(movieDTO.getTitle());
+      movieRepository.save(movie);
+      // movieImageList :: 수정창에서 이미지 수정할 게 있는 경우의 목록
+      List<MovieImage> newMovieImageList =
+          (List<MovieImage>) entityMap.get("movieImageList");
+      List<MovieImage> oldMovieImageList =
+          movieImageRepository.findByMno(movie.getMno());
+      if(newMovieImageList == null || newMovieImageList.size() == 0) {
+        // 수정창에서 이미지 모두를 지웠을 때
+        movieImageRepository.deleteByMno(movie.getMno());
+        for (int i = 0; i < oldMovieImageList.size(); i++) {
+          MovieImage oldMovieImage = oldMovieImageList.get(i);
+          String fileName = oldMovieImage.getPath() + File.separator
+              + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
+          deleteFile(fileName);
+        }
+      } else { // newMovieImageList에 일부 변화 발생
+        newMovieImageList.forEach(movieImage -> {
+          boolean result1 = false;
+          for (int i = 0; i < oldMovieImageList.size(); i++) {
+            result1 = oldMovieImageList.get(i).getUuid().equals(movieImage.getUuid());
+            if(result1) break;
+          }
+          if(!result1) movieImageRepository.save(movieImage);
+        });
+        oldMovieImageList.forEach(oldMovieImage -> {
+          boolean result1 = false;
+          for (int i = 0; i < newMovieImageList.size(); i++) {
+            result1 = newMovieImageList.get(i).getUuid().equals(oldMovieImage.getUuid());
+            if(result1) break;
+          }
+          if(!result1) {
+            movieImageRepository.deleteByUuid(oldMovieImage.getUuid());
+            String fileName = oldMovieImage.getPath() + File.separator
+                + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
+            deleteFile(fileName);
+          }
+        });
+      }
+    }
+  }
+
+  private void deleteFile(String fileName) {
+    // 실제 파일도 지우기
+    String searchFilename = null;
+    try {
+      searchFilename = URLDecoder.decode(fileName, "UTF-8");
+      File file = new File(uploadPath + File.separator + searchFilename);
+      file.delete();
+      new File(file.getParent(), "s_" + file.getName()).delete();
+    } catch (Exception e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @Transactional
+  @Override
+  public List<String> removeWithReviewsAndMovieImages(Long mno) {
+    List<MovieImage> list = movieImageRepository.findByMno(mno);
+    List<String> result = new ArrayList<>();
+    list.forEach(new Consumer<MovieImage>() {
+      @Override
+      public void accept(MovieImage t) {
+        result.add(t.getPath() + File.separator + t.getUuid() + "_" + t.getImgName());
+      }
+    });
+    movieImageRepository.deleteByMno(mno);
+    reviewRepository.deleteByMno(mno);
+    movieRepository.deleteById(mno);
+    return result;
+  }
+
 }

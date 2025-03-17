@@ -39,6 +39,9 @@ public class SecurityConfig {
             .requestMatchers(new AntPathRequestMatcher("/journal/**")).permitAll()
             .requestMatchers("/comments/**").permitAll()
             .requestMatchers("/members/get/**").permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/uploadAjax")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/display/**")).permitAll()
+            .requestMatchers(new AntPathRequestMatcher("/removeFile/**")).permitAll()
 
             // 그 외는 모두 막음.
             .anyRequest().denyAll()
@@ -65,7 +68,10 @@ public class SecurityConfig {
   @Bean
   public ApiCheckFilter apiCheckFilter() {
     return new ApiCheckFilter(
-        new String[]{"/comments/**", "/journal/**", "/members/get/**"}
+        new String[]{"/comments/**", "/journal/**", "/members/get/**"
+            ,"/uploadAjax", "/removeFile/**"
+            //,"/display/**",
+        }
         , jwtUtil());
   }
 
